@@ -24,7 +24,7 @@ public class Mikasa {
         } else if (this.estado.equals("especial")) {
             entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.BLUE);
         } else if (this.estado.equals("colision")) {
-            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.ORANGE);
+            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.GRAY);
         }
     }
 

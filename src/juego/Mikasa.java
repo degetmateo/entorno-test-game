@@ -31,12 +31,14 @@ public class Mikasa {
         this.x += this.velocidad;
 
         for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(this.x, this.y, 
+            if (Juego.colision(
+                this.x, this.y, 
                 Juego.edificios[i].getX(), Juego.edificios[i].getY(), 
                 this.ancho, this.alto, 
-                this.ancho, this.alto)) {
+                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
                 
                 this.x = Juego.edificios[i].getX() - this.ancho;
+                this.estado = "colision";
             }
         }
     }
@@ -45,12 +47,14 @@ public class Mikasa {
         this.x -= this.velocidad;
 
         for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(this.x, this.y,
+            if (Juego.colision(
+                this.x, this.y,
                 Juego.edificios[i].getX(), Juego.edificios[i].getY(),
                 this.ancho, this.alto,
-                this.ancho, this.alto)) {
+                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
 
                 this.x = Juego.edificios[i].getX() + Juego.edificios[i].getAncho();
+                this.estado = "colision";
             }
         }
     }
@@ -59,12 +63,14 @@ public class Mikasa {
         this.y -= this.velocidad;
 
         for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(this.x, this.y,
+            if (Juego.colision(
+                this.x, this.y,
                 Juego.edificios[i].getX(), Juego.edificios[i].getY(),
                 this.ancho, this.alto,
-                this.ancho, this.alto)) {
+                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
 
                 this.y = Juego.edificios[i].getY() + Juego.edificios[i].getAlto();
+                this.estado = "colision";
             }
         }
     }
@@ -73,12 +79,14 @@ public class Mikasa {
         this.y += this.velocidad;
 
         for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(this.x, this.y,
+            if (Juego.colision(
+                this.x, this.y,
                 Juego.edificios[i].getX(), Juego.edificios[i].getY(),
                 this.ancho, this.alto,
-                this.ancho, this.alto)) {
+                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
 
                 this.y = Juego.edificios[i].getY() - this.alto;
+                this.estado = "colision";
             }
         }
     }

@@ -6,12 +6,14 @@ import java.awt.*;
 public class Edificio {
     private int x;
     private int y;
-    private int ancho = 50;
-    private int alto = 50;
+    private int ancho;
+    private int alto;
 
-    public Edificio(int x, int y) {
+    public Edificio(int x, int y, int ancho, int alto) {
         this.x = x;
         this.y = y;
+        this.ancho = ancho;
+        this.alto = alto;
     }
 
     public void dibujar(Entorno entorno) {
@@ -19,19 +21,19 @@ public class Edificio {
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getY() {
-        return y;
+        return this.y;
     }
 
     public int getAncho() {
-        return ancho;
+        return this.ancho;
     }
 
     public int getAlto() {
-        return alto;
+        return this.alto;
     }
 
     public void setX(int x) {

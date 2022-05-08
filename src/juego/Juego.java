@@ -18,10 +18,9 @@ public class Juego extends InterfaceJuego {
 	public Juego() {
 		// Inicializa el objeto entorno
 		this.entorno = new Entorno(this, "Attack on Titan - Grupo 6 - Apellido1 - Apellido2 -Apellido3 - V0.01", 800, 600);
-		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		// Inicializar lo que haga falta para el juego
 		// ...
-
+		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.generar_edificios(4);
 		this.mikasa = new Mikasa(200, 200, 4);
 
@@ -94,36 +93,27 @@ public class Juego extends InterfaceJuego {
 		edificios = new Edificio[cantidad];
 
 		for (int i = 0; i < edificios.length; i++) {
-			edificios[i] = new Edificio(new Random().nextInt(600), new Random().nextInt(400));
+			// int ran = new Random().nextInt(30, 80);
+
+			int ranX = new Random().nextInt(80, entorno.ancho() - 80);
+			int ranY = new Random().nextInt(80, entorno.alto() - 80);
+
+			edificios[i] = new Edificio(ranX, ranY, 50, 50);
 		}
 	}
 
 	public void reiniciar_edificios() {
 		for (int i = 0; i < edificios.length; i++) {
-			edificios[i].setX(new Random().nextInt(600));
-			edificios[i].setY(new Random().nextInt(400));
+			// int ran = new Random().nextInt(30, 80);
+
+			edificios[i].setX(new Random().nextInt(80, entorno.ancho() - 80));
+			edificios[i].setY(new Random().nextInt(80, entorno.ancho() - 80));
+			edificios[i].setAncho(50);
+			edificios[i].setAlto(50);
 		}
 	}
 
 	public void movimiento_mikasa() {
-		// Comprobar si Mikasa se salió de la pantalla. 
-
-		if (this.mikasa.getX() < this.mikasa.getAncho() / 2) {
-			this.mikasa.setX(this.mikasa.getAncho() / 2);
-		}
-
-		if (this.mikasa.getX() > this.entorno.ancho() - this.mikasa.getAncho() / 2) {
-			this.mikasa.setX(this.entorno.ancho() - this.mikasa.getAncho() / 2);
-		}
-
-		if (this.mikasa.getY() < this.mikasa.getAlto() / 2) {
-			this.mikasa.setY(this.mikasa.getAlto() / 2);
-		}
-
-		if (this.mikasa.getY() > this.entorno.alto() - this.mikasa.getAlto() / 2) {
-			this.mikasa.setY(this.entorno.alto() - this.mikasa.getAlto() / 2);
-		}
-
 		// Comprobar si se presionaron las teclas de movimiento, y mover a Mikasa en tal caso.
 
 		if (this.entorno.estaPresionada(entorno.TECLA_ESPACIO)) {
@@ -146,6 +136,24 @@ public class Juego extends InterfaceJuego {
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO)) {
 			this.mikasa.moverAbajo();
+		}
+
+		// Comprobar si Mikasa se salió de la pantalla. 
+
+		if (this.mikasa.getX() < this.mikasa.getAncho() / 2) {
+			this.mikasa.setX(this.mikasa.getAncho() / 2);
+		}
+
+		if (this.mikasa.getX() > this.entorno.ancho() - this.mikasa.getAncho() / 2) {
+			this.mikasa.setX(this.entorno.ancho() - this.mikasa.getAncho() / 2);
+		}
+
+		if (this.mikasa.getY() < this.mikasa.getAlto() / 2) {
+			this.mikasa.setY(this.mikasa.getAlto() / 2);
+		}
+
+		if (this.mikasa.getY() > this.entorno.alto() - this.mikasa.getAlto() / 2) {
+			this.mikasa.setY(this.entorno.alto() - this.mikasa.getAlto() / 2);
 		}
 	}
 	

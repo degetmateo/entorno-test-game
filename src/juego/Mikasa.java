@@ -6,8 +6,8 @@ import java.awt.*;
 public class Mikasa {
     private int x;
     private int y;
-    private int ancho = 50;
-    private int alto = 50;
+    private int ancho = 70;
+    private int alto = 70;
     private int velocidad;
     private String estado = "normal";
 
@@ -23,7 +23,7 @@ public class Mikasa {
         } else if (this.estado.equals("especial")) {
             entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.BLUE);
         } else if (this.estado.equals("colision")) {
-            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.RED);
+            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.ORANGE);
         }
     }
 

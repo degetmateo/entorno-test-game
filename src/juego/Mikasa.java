@@ -17,6 +17,7 @@ public class Mikasa {
         this.velocidad = velocidad;
     }
 
+    // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
         if (this.estado.equals("normal")) {
             entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.WHITE);
@@ -27,6 +28,7 @@ public class Mikasa {
         }
     }
 
+    // Funciones que mueven a Mikasa a un lado o a otro. Además verifican que no haya una colision con los edificios.
     public void moverDerecha() {
         this.x += this.velocidad;
 

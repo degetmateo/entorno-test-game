@@ -24,7 +24,7 @@ public class Juego extends InterfaceJuego {
 		// ...
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.generar_edificios(4);
-		this.suero = new Suero(new Random().nextInt(80, entorno.ancho() - 80), new Random().nextInt(80, entorno.ancho() - 80));
+		this.suero = new Suero(new Random().nextInt(80, entorno.ancho() - 80), new Random().nextInt(80, entorno.alto() - 80));
 		this.mikasa = new Mikasa(200, 200, 4);
 
 		// Inicia el juego!
@@ -41,6 +41,8 @@ public class Juego extends InterfaceJuego {
 		// Procesamiento de un instante de tiempo
 		// ...
 
+		// Se verifica el valor del String estado de la clase juego.
+		// Dependiendo de cuál sea el valor, se mostrara una pantalla u otra.
 		if (this.estado.equals("inicio")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
 			entorno.escribirTexto("Attack on Titan", 50, 60);
@@ -51,6 +53,8 @@ public class Juego extends InterfaceJuego {
 			entorno.cambiarFont("Arial", 28, Color.white);
 			entorno.escribirTexto("Presione ENTER para comenzar", 50, 180);
 
+			// Si se presiona la tecla ENTER se cambia el estado del objeto juego.
+			// En consecuencia se cambia la pantalla a la de juego.
 			if (entorno.estaPresionada(entorno.TECLA_ENTER)) {
 				this.estado = "juego";
 			}
@@ -60,22 +64,29 @@ public class Juego extends InterfaceJuego {
 			for (int i = 0; i < edificios.length; i++) {
 				edificios[i].dibujar(this.entorno);
 			}
-	
-			this.suero.dibujar(entorno);
 
 			this.movimiento_mikasa();
 			this.mikasa.dibujar(this.entorno);
 
-			if (colision(
-					this.mikasa.getX(), this.mikasa.getY(),
-					this.suero.getX(), this.suero.getY(),
-					this.mikasa.getAncho(), this.mikasa.getAlto(),
-					this.suero.getAncho(), this.suero.getAlto())) {
-				this.suero.setX(-70);
-				this.suero.setY(-70);
-				this.contador_habilidad = 900;
+			// Verificar si el suerto aún existe.
+			if (this.suero != null) {
+				// Dibujar el suerto.
+				this.suero.dibujar(entorno);
+
+				// Verificar si hay una colisión con el suero.
+				if (colision(
+						this.mikasa.getX(), this.mikasa.getY(),
+						this.suero.getX(), this.suero.getY(),
+						this.mikasa.getAncho(), this.mikasa.getAlto(),
+						this.suero.getAncho(), this.suero.getAlto())) {
+					// Si Mikasa colisiona con el suero este se elimina y se cambia el varlor de contador_habilidad.
+					this.suero = null;
+					this.contador_habilidad = 900;
+				}
 			}
 
+			// Si el contador_habilidad es mayor a cero mikasa gana el estado "especial" y cambia de color.
+			// Además, el contador_habilidad irá disminuyendo en cada tick.
 			if (this.contador_habilidad > 0) {
 				this.contador_habilidad--;
 				this.mikasa.setEstado("especial");
@@ -89,6 +100,8 @@ public class Juego extends InterfaceJuego {
 			entorno.cambiarFont("Arial", 28, Color.white);
 			entorno.escribirTexto("Presione ENTER para volver a jugar", 50, 100);
 
+			// Si se presiona la tecla ENTER se cambia el estado del objeto juego.
+			// En consecuencia se cambia la pantalla a la de juego.
 			if (entorno.estaPresionada(entorno.TECLA_ENTER)) {
 				this.mikasa.setX(entorno.ancho() / 2);
 				this.mikasa.setY(entorno.alto() / 2);
@@ -103,6 +116,8 @@ public class Juego extends InterfaceJuego {
 		this.entorno.dibujarImagen(this.imgFondo, 400, 300, 0, 1);
 	}
 
+	// Funcion que comprueba si hay una colisión.
+	// Recibe dos pares de vectores (x, y) y dos pares de dimensiones (ancho, alto).
 	public static boolean colision(double x1, double y1, double x2, double y2, double w1, double h1, double w2, double h2) {
 		if (x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && h1 + y1 > y2) {
 			return true;
@@ -111,6 +126,7 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
+	// Esta funcion genera edificios (obstáculos) en una posición al azar.
 	public void generar_edificios(int cantidad) {
 		edificios = new Edificio[cantidad];
 
@@ -124,6 +140,7 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
+	// Esta funcion cambia las posiciones de todos los edificios.
 	public void reiniciar_edificios() {
 		for (int i = 0; i < edificios.length; i++) {
 			// int ran = new Random().nextInt(30, 80);

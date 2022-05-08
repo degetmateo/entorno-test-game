@@ -8,13 +8,13 @@ public class Mikasa {
     private int y;
     private int ancho = 50;
     private int alto = 50;
-    private int factor_velocidad;
+    private int velocidad;
     private String estado = "normal";
 
-    public Mikasa(int x, int y, int factor_velocidad) {
+    public Mikasa(int x, int y, int velocidad) {
         this.x = x;
         this.y = y;
-        this.factor_velocidad = factor_velocidad;
+        this.velocidad = velocidad;
     }
 
     public void dibujar(Entorno entorno) {
@@ -28,19 +28,59 @@ public class Mikasa {
     }
 
     public void moverDerecha() {
-        this.x += this.factor_velocidad;
+        this.x += this.velocidad;
+
+        for (int i = 0; i < Juego.edificios.length; i++) {
+            if (Juego.colision(this.x, this.y, 
+                Juego.edificios[i].getX(), Juego.edificios[i].getY(), 
+                this.ancho, this.alto, 
+                this.ancho, this.alto)) {
+                
+                this.x = Juego.edificios[i].getX() - this.ancho;
+            }
+        }
     }
 
     public void moverIzquierda() {
-        this.x -= this.factor_velocidad;
+        this.x -= this.velocidad;
+
+        for (int i = 0; i < Juego.edificios.length; i++) {
+            if (Juego.colision(this.x, this.y,
+                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
+                this.ancho, this.alto,
+                this.ancho, this.alto)) {
+
+                this.x = Juego.edificios[i].getX() + Juego.edificios[i].getAncho();
+            }
+        }
     }
 
     public void moverArriba() {
-        this.y -= this.factor_velocidad;
+        this.y -= this.velocidad;
+
+        for (int i = 0; i < Juego.edificios.length; i++) {
+            if (Juego.colision(this.x, this.y,
+                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
+                this.ancho, this.alto,
+                this.ancho, this.alto)) {
+
+                this.y = Juego.edificios[i].getY() + Juego.edificios[i].getAlto();
+            }
+        }
     }
 
     public void moverAbajo() {
-        this.y += this.factor_velocidad;
+        this.y += this.velocidad;
+
+        for (int i = 0; i < Juego.edificios.length; i++) {
+            if (Juego.colision(this.x, this.y,
+                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
+                this.ancho, this.alto,
+                this.ancho, this.alto)) {
+
+                this.y = Juego.edificios[i].getY() - this.alto;
+            }
+        }
     }
 
     public int getX() {
@@ -59,8 +99,8 @@ public class Mikasa {
         return alto;
     }
 
-    public int getFactor_velocidad() {
-        return factor_velocidad;
+    public int getVelocidad() {
+        return velocidad;
     }
 
     public String getEstado() {
@@ -83,8 +123,8 @@ public class Mikasa {
         this.alto = alto;
     }
 
-    public void setFactor_velocidad(int factor_velocidad) {
-        this.factor_velocidad = factor_velocidad;
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
     }
 
     public void setEstado(String estado) {

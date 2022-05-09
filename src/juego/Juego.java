@@ -1,8 +1,6 @@
 package juego;
 
-import java.awt.Image;
-import java.util.Random;
-import java.awt.Color;
+import java.awt.*;
 
 import entorno.*;
 
@@ -24,7 +22,9 @@ public class Juego extends InterfaceJuego {
 		// ...
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.generar_edificios(4);
-		this.suero = new Suero(new Random().nextInt(80, entorno.ancho() - 80), new Random().nextInt(80, entorno.alto() - 80));
+		int rX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
+		int rY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
+		this.suero = new Suero(rX, rY);
 		this.mikasa = new Mikasa(200, 200, 4);
 
 		// Inicia el juego!
@@ -65,12 +65,13 @@ public class Juego extends InterfaceJuego {
 				edificios[i].dibujar(this.entorno);
 			}
 
+			
 			this.movimiento_mikasa();
 			this.mikasa.dibujar(this.entorno);
 
 			// Verificar si el suerto aún existe.
 			if (this.suero != null) {
-				// Dibujar el suerto.
+				// Dibujar el suero.
 				this.suero.dibujar(entorno);
 
 				// Verificar si hay una colisión con el suero.
@@ -92,6 +93,10 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setEstado("especial");
 			} else {
 				this.mikasa.setEstado("normal");
+			}
+
+			if (this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
+				this.estado = "final";
 			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
@@ -133,8 +138,8 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < edificios.length; i++) {
 			// int ran = new Random().nextInt(30, 80);
 
-			int ranX = new Random().nextInt(80, entorno.ancho() - 80);
-			int ranY = new Random().nextInt(80, entorno.alto() - 80);
+			int ranX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
+			int ranY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
 
 			edificios[i] = new Edificio(ranX, ranY, 70, 70);
 		}
@@ -145,30 +150,32 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < edificios.length; i++) {
 			// int ran = new Random().nextInt(30, 80);
 
-			edificios[i].setX(new Random().nextInt(80, entorno.ancho() - 80));
-			edificios[i].setY(new Random().nextInt(80, entorno.ancho() - 80));
+			int rX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
+			int rY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
+
+			edificios[i].setX(rX);
+			edificios[i].setY(rY);
 			edificios[i].setAncho(70);
 			edificios[i].setAlto(70);
 		}
 	}
 
 	public void movimiento_mikasa() {
-		// Comprobar si se presionaron las teclas de movimiento, y mover a Mikasa en tal caso.
-
-		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
-			this.mikasa.moverDerecha();
-		}
-
-		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
-			this.mikasa.moverIzquierda();
-		}
-
+		// Comprobar si una tecla de movimiento está presionada y mover a mikasa en consecuencia.
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA)) {
 			this.mikasa.moverArriba();
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO)) {
 			this.mikasa.moverAbajo();
+		}
+
+		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
+			this.mikasa.moverIzquierda();
+		}
+
+		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
+			this.mikasa.moverDerecha();
 		}
 
 		// Comprobar si Mikasa se salió de la pantalla. 

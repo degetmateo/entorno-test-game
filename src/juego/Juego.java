@@ -10,10 +10,13 @@ public class Juego extends InterfaceJuego {
 	private String estado = "inicio";
 	private Entorno entorno;
 	private Image imgFondo;
+	private Image imgInicio;
 	private Mikasa mikasa;
 	private Edificio[] edificios;
+	private Disparo[] disparos;
 	private Suero suero;
 	private int contador_habilidad = 0;
+	private int cooldown_disparo = 0;
 	
 	public Juego() {
 		// Inicializa el objeto entorno
@@ -21,6 +24,7 @@ public class Juego extends InterfaceJuego {
 		// Inicializar lo que haga falta para el juego
 		// ...
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
+		this.imgInicio = Herramientas.cargarImagen("tapa.jpg");
 		this.generar_edificios(4);
 		this.generar_suero();
 		this.mikasa = new Mikasa(200, 200, 4);
@@ -42,14 +46,8 @@ public class Juego extends InterfaceJuego {
 		// Se verifica el valor del String estado de la clase juego.
 		// Dependiendo de cuál sea el valor, se mostrara una pantalla u otra.
 		if (this.estado.equals("inicio")) {
-			entorno.cambiarFont("Arial", 32, Color.white);
-			entorno.escribirTexto("Attack on Titan", 50, 60);
-
-			entorno.cambiarFont("Arial", 26, Color.white);
-			entorno.escribirTexto("The Game", 50, 100);
-
-			entorno.cambiarFont("Arial", 28, Color.white);
-			entorno.escribirTexto("Presione ENTER para comenzar", 50, 180);
+			// Dibujar la pantalla de inicio.
+			this.dibujar_inicio();
 
 			// Si se presiona la tecla ENTER se cambia el estado del objeto juego.
 			// En consecuencia se cambia la pantalla a la de juego.
@@ -88,9 +86,13 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setEstado("normal");
 			}
 
-			if (this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
-				this.estado = "final";
+			if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
+				this.disparar();
 			}
+
+			if (this.cooldown_disparo > 0) this.cooldown_disparo--;
+
+			this.trayectoriaDisparos();
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
 			entorno.escribirTexto("Has Perdido", 50, 60);
@@ -115,6 +117,10 @@ public class Juego extends InterfaceJuego {
 		this.entorno.dibujarImagen(this.imgFondo, 400, 300, 0, 1);
 	}
 
+	public void dibujar_inicio() {
+		this.entorno.dibujarImagen(this.imgInicio, 400, 300, 0, 1);
+	}
+
 	// Funcion que comprueba si hay una colisión.
 	// Recibe dos pares de vectores (x, y) y dos pares de dimensiones (ancho, alto).
 	public boolean colision(Rectangle a, Rectangle b) {
@@ -133,7 +139,7 @@ public class Juego extends InterfaceJuego {
 			int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
 			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
-			this.edificios[i] = new Edificio(ranX, ranY, 50, 50);
+			this.edificios[i] = new Edificio(ranX, ranY, 70, 70);
 		}	
 	}
 
@@ -153,6 +159,33 @@ public class Juego extends InterfaceJuego {
 		this.generar_suero();
 	}
 
+	public void disparar() {
+		if (this.disparos == null) {
+			this.disparos = new Disparo[1];
+			this.disparos[0] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
+		} else {
+			Disparo[] disparos_nuevo = new Disparo[this.disparos.length + 1];
+
+			for (int i = 0; i < this.disparos.length; i++) {
+				disparos_nuevo[i] = this.disparos[i];
+			}
+
+			disparos_nuevo[disparos_nuevo.length - 1] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
+			this.disparos = disparos_nuevo;
+		}
+
+		this.cooldown_disparo = 60;
+	}
+
+	public void trayectoriaDisparos() {
+		if (this.disparos != null && this.disparos.length > 0) {
+			for (Disparo disparo: this.disparos) {
+				disparo.mover();
+				disparo.dibujar(this.entorno);
+			}
+		}
+	}
+
 	public void movimiento_mikasa() {
 		// Comprobar si una tecla de movimiento está presionada y mover a mikasa en consecuencia.
 		// Comprobar si mikasa colisiona con un edificio.
@@ -161,8 +194,7 @@ public class Juego extends InterfaceJuego {
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.moverAbajo();
-					this.mikasa.setEstado("colision");
+					this.mikasa.setY(this.mikasa.getY() + this.mikasa.getVelocidad());
 				}
 			}
 		}
@@ -172,8 +204,7 @@ public class Juego extends InterfaceJuego {
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.moverArriba();
-					this.mikasa.setEstado("colision");
+					this.mikasa.setY(this.mikasa.getY() - this.mikasa.getVelocidad());
 				}
 			}
 		}
@@ -183,8 +214,7 @@ public class Juego extends InterfaceJuego {
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.moverDerecha();
-					this.mikasa.setEstado("colision");
+					this.mikasa.setX(this.mikasa.getX() + this.mikasa.getVelocidad());
 				}
 			}
 		}
@@ -194,8 +224,7 @@ public class Juego extends InterfaceJuego {
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.moverIzquierda();
-					this.mikasa.setEstado("colision");
+					this.mikasa.setX(this.mikasa.getX() - this.mikasa.getVelocidad());
 				}
 			}
 		}

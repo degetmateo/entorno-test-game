@@ -1,17 +1,22 @@
 package juego;
 
 import entorno.Entorno;
+import entorno.Herramientas;
+
 import java.awt.*;
 
 public class Suero {
     private Rectangle rec;
+    private Image img;
 
     public Suero(int x, int y) {
         this.rec = new Rectangle(x, y, 70, 70);
+        this.img = Herramientas.cargarImagen("suero.png");
     }
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), 0, Color.GREEN);
+        entorno.dibujarImagen(this.getImg(), this.getX(), this.getY(), 0, 0.2);
     }
 
     public int getX() {
@@ -34,6 +39,10 @@ public class Suero {
         return this.rec;
     }
 
+    public Image getImg() {
+        return this.img;
+    }
+
     public void setX(int x) {
         this.rec.x = x;
     }
@@ -48,5 +57,9 @@ public class Suero {
 
     public void setAlto(int alto) {
         this.rec.height = alto;
+    }
+
+    public void setImg(String img) {
+        this.img = Herramientas.cargarImagen(img);
     }
 }

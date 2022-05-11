@@ -221,29 +221,25 @@ public class Juego extends InterfaceJuego {
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) || this.entorno.estaPresionada('w')) {
 			this.mikasa.mover_adelante();
 
-			for (int i = 0; i < this.edificios.length; i++) {
-				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.mover_atras();
-				}
+			for (Edificio edificio: this.edificios) {
+				if (this.colision(this.mikasa.getRec(), edificio.getRec())) this.mikasa.mover_atras();
 			}
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO) || this.entorno.estaPresionada('s')) {
 			this.mikasa.mover_atras();
 
-			for (int i = 0; i < this.edificios.length; i++) {
-				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.mover_adelante();
-				}
+			for (Edificio edificio: this.edificios) {
+				if (this.colision(this.mikasa.getRec(), edificio.getRec())) this.mikasa.mover_adelante();
 			}
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
-			this.mikasa.girar_izquierda();
+			this.mikasa.girar(-0.05);
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
-			this.mikasa.girar_derecha();
+			this.mikasa.girar(0.05);
 		}
 
 		// Comprobar si Mikasa se sale de la pantalla. 

@@ -12,7 +12,6 @@ public class Mikasa {
     private int velocidad;
     private String estado = "normal";
     private double angulo = 0;
-    private double modificador = 0.05;
 
     public Mikasa(int x, int y, int velocidad) {
         this.rec = new Rectangle(x, y, 70, 70);
@@ -22,7 +21,7 @@ public class Mikasa {
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
+        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.getAngulo(), Color.WHITE);
 
         if (this.estado.equals("normal")) {
             entorno.dibujarImagen(this.img, this.getX(), this.getY(), this.getAngulo(), 3);
@@ -49,12 +48,16 @@ public class Mikasa {
         this.setY(this.getY() - sen);
     }
 
-    public void girar_izquierda() {
-        this.setAngulo(this.getAngulo() - this.getModificador());
-    }
+    public void girar(double modificador) {
+        this.setAngulo(this.getAngulo() + modificador);
 
-    public void girar_derecha() {
-        this.setAngulo(this.getAngulo() + this.getModificador());
+        if (this.getAngulo() < 0) {
+            this.setAngulo(this.getAngulo() + 2 * Math.PI);
+        }
+
+        if (this.getAngulo() > 2 * Math.PI) {
+            this.setAngulo(this.getAngulo() - 2 * Math.PI);
+        }
     }
 
     public int getX() {
@@ -87,10 +90,6 @@ public class Mikasa {
 
     public double getAngulo() {
         return this.angulo;
-    }
-
-    public double getModificador() {
-        return this.modificador;
     }
 
     public void setX(double x) {

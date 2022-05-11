@@ -4,49 +4,49 @@ import entorno.Entorno;
 import java.awt.*;
 
 public class Suero {
-    private int x;
-    private int y;
-    private int ancho = 70;
-    private int alto = 70;
+    private Rectangle rec;
 
     public Suero(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.rec = new Rectangle(x, y, 70, 70);
     }
 
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.GREEN);
+        entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), 0, Color.GREEN);
     }
 
     public int getX() {
-        return this.x;
+        return this.rec.x;
     }
 
     public int getY() {
-        return this.y;
+        return this.rec.y;
     }
 
     public int getAncho() {
-        return this.ancho;
+        return this.rec.width;
     }
 
     public int getAlto() {
-        return this.alto;
+        return this.rec.height;
+    }
+
+    public Rectangle getRec() {
+        return this.rec;
     }
 
     public void setX(int x) {
-        this.x = x;
+        this.rec.x = x;
     }
 
     public void setY(int y) {
-        this.y = y;
+        this.rec.y = y;
     }
 
     public void setAncho(int ancho) {
-        this.ancho = ancho;
+        this.rec.width = ancho;
     }
 
     public void setAlto(int alto) {
-        this.alto = alto;
+        this.rec.height = alto;
     }
 }

@@ -1,7 +1,7 @@
 package juego;
 
 import java.awt.*;
-
+import java.util.concurrent.ThreadLocalRandom;
 import entorno.*;
 
 public class Juego extends InterfaceJuego {
@@ -11,7 +11,7 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	private Image imgFondo;
 	private Mikasa mikasa;
-	public static Edificio[] edificios;
+	private Edificio[] edificios;
 	private Suero suero;
 	private int contador_habilidad = 0;
 	
@@ -22,9 +22,7 @@ public class Juego extends InterfaceJuego {
 		// ...
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.generar_edificios(4);
-		int rX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
-		int rY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
-		this.suero = new Suero(rX, rY);
+		this.generar_suero();
 		this.mikasa = new Mikasa(200, 200, 4);
 
 		// Inicia el juego!
@@ -65,21 +63,16 @@ public class Juego extends InterfaceJuego {
 				edificios[i].dibujar(this.entorno);
 			}
 
-			
 			this.movimiento_mikasa();
 			this.mikasa.dibujar(this.entorno);
 
-			// Verificar si el suerto aún existe.
+			// Verificar si el suero aún existe.
 			if (this.suero != null) {
 				// Dibujar el suero.
 				this.suero.dibujar(entorno);
 
 				// Verificar si hay una colisión con el suero.
-				if (colision(
-						this.mikasa.getX(), this.mikasa.getY(),
-						this.suero.getX(), this.suero.getY(),
-						this.mikasa.getAncho(), this.mikasa.getAlto(),
-						this.suero.getAncho(), this.suero.getAlto())) {
+				if (this.colision(this.mikasa.getRec(), this.suero.getRec())) {
 					// Si Mikasa colisiona con el suero este se elimina y se cambia el varlor de contador_habilidad.
 					this.suero = null;
 					this.contador_habilidad = 900;
@@ -111,6 +104,7 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setX(entorno.ancho() / 2);
 				this.mikasa.setY(entorno.alto() / 2);
 				this.reiniciar_edificios();
+				this.reiniciar_suero();
 
 				this.estado = "juego";
 			}
@@ -123,63 +117,90 @@ public class Juego extends InterfaceJuego {
 
 	// Funcion que comprueba si hay una colisión.
 	// Recibe dos pares de vectores (x, y) y dos pares de dimensiones (ancho, alto).
-	public static boolean colision(double x1, double y1, double x2, double y2, double w1, double h1, double w2, double h2) {
-		if (x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && h1 + y1 > y2) {
-			return true;
-		} else {
-			return false;
-		}
+	public boolean colision(Rectangle a, Rectangle b) {
+		return (a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y);
 	}
+
+	// public boolean colision(Rectangle a, Rectangle b) {
+	// 	return a.intersects(b);
+	// }
 
 	// Esta funcion genera edificios (obstáculos) en una posición al azar.
 	public void generar_edificios(int cantidad) {
-		edificios = new Edificio[cantidad];
+		this.edificios = new Edificio[cantidad];
 
-		for (int i = 0; i < edificios.length; i++) {
-			// int ran = new Random().nextInt(30, 80);
+		for (int i = 0; i < this.edificios.length; i++) {
+			int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
-			int ranX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
-			int ranY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
-
-			edificios[i] = new Edificio(ranX, ranY, 70, 70);
-		}
+			this.edificios[i] = new Edificio(ranX, ranY, 50, 50);
+		}	
 	}
 
 	// Esta funcion cambia las posiciones de todos los edificios.
 	public void reiniciar_edificios() {
-		for (int i = 0; i < edificios.length; i++) {
-			// int ran = new Random().nextInt(30, 80);
+		this.generar_edificios(this.edificios.length);
+	}
 
-			int rX = (int) (Math.random() * ((entorno.ancho() - 80) - 80) + 80);
-			int rY = (int) (Math.random() * ((entorno.alto() - 80) - 80) + 80);
+	public void generar_suero() {
+		int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+		int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
-			edificios[i].setX(rX);
-			edificios[i].setY(rY);
-			edificios[i].setAncho(70);
-			edificios[i].setAlto(70);
-		}
+		this.suero = new Suero(ranX, ranY);
+	}
+
+	public void reiniciar_suero() {
+		this.generar_suero();
 	}
 
 	public void movimiento_mikasa() {
 		// Comprobar si una tecla de movimiento está presionada y mover a mikasa en consecuencia.
-		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA)) {
+		// Comprobar si mikasa colisiona con un edificio.
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) || this.entorno.estaPresionada('w')) {
 			this.mikasa.moverArriba();
+
+			for (int i = 0; i < this.edificios.length; i++) {
+				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
+					this.mikasa.moverAbajo();
+					this.mikasa.setEstado("colision");
+				}
+			}
 		}
 
-		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO)) {
+		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO) || this.entorno.estaPresionada('s')) {
 			this.mikasa.moverAbajo();
+
+			for (int i = 0; i < this.edificios.length; i++) {
+				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
+					this.mikasa.moverArriba();
+					this.mikasa.setEstado("colision");
+				}
+			}
 		}
 
-		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA)) {
+		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
 			this.mikasa.moverIzquierda();
+
+			for (int i = 0; i < this.edificios.length; i++) {
+				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
+					this.mikasa.moverDerecha();
+					this.mikasa.setEstado("colision");
+				}
+			}
 		}
 
-		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA)) {
+		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
 			this.mikasa.moverDerecha();
+
+			for (int i = 0; i < this.edificios.length; i++) {
+				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
+					this.mikasa.moverIzquierda();
+					this.mikasa.setEstado("colision");
+				}
+			}
 		}
 
-		// Comprobar si Mikasa se salió de la pantalla. 
-
+		// Comprobar si Mikasa se sale de la pantalla. 
 		if (this.mikasa.getX() < this.mikasa.getAncho() / 2) {
 			this.mikasa.setX(this.mikasa.getAncho() / 2);
 		}

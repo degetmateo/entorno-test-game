@@ -4,109 +4,62 @@ import entorno.Entorno;
 import java.awt.*;
 
 public class Mikasa {
-    private int x;
-    private int y;
-    private int ancho = 70;
-    private int alto = 70;
     private int velocidad;
     private String estado = "normal";
+    private Rectangle rec;
 
     public Mikasa(int x, int y, int velocidad) {
-        this.x = x;
-        this.y = y;
         this.velocidad = velocidad;
+        this.rec = new Rectangle(x, y, 70, 70);
     }
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
         if (this.estado.equals("normal")) {
-            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.WHITE);
+            entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
         } else if (this.estado.equals("especial")) {
-            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.BLUE);
+            entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.BLUE);
         } else if (this.estado.equals("colision")) {
-            entorno.dibujarRectangulo(x, y, this.ancho, this.alto, 0, Color.GRAY);
+            entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.GRAY);
         }
     }
 
     // Funciones que mueven a Mikasa a un lado o a otro. Además verifican que no haya una colision con los edificios.
-    public void moverDerecha() {
-        this.x += this.velocidad;
-
-        for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(
-                this.x, this.y, 
-                Juego.edificios[i].getX(), Juego.edificios[i].getY(), 
-                this.ancho, this.alto, 
-                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
-                
-                this.x = Juego.edificios[i].getX() - this.ancho;
-                this.estado = "colision";
-            }
-        }
-    }
-
-    public void moverIzquierda() {
-        this.x -= this.velocidad;
-
-        for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(
-                this.x, this.y,
-                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
-                this.ancho, this.alto,
-                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
-
-                this.x = Juego.edificios[i].getX() + Juego.edificios[i].getAncho();
-                this.estado = "colision";
-            }
-        }
-    }
 
     public void moverArriba() {
-        this.y -= this.velocidad;
-
-        for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(
-                this.x, this.y,
-                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
-                this.ancho, this.alto,
-                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
-
-                this.y = Juego.edificios[i].getY() + Juego.edificios[i].getAlto();
-                this.estado = "colision";
-            }
-        }
+        this.setY(this.getY() - this.getVelocidad());
     }
 
     public void moverAbajo() {
-        this.y += this.velocidad;
+        this.setY(this.getY() + this.getVelocidad());
+    }
 
-        for (int i = 0; i < Juego.edificios.length; i++) {
-            if (Juego.colision(
-                this.x, this.y,
-                Juego.edificios[i].getX(), Juego.edificios[i].getY(),
-                this.ancho, this.alto,
-                Juego.edificios[i].getAncho(), Juego.edificios[i].getAlto())) {
+    public void moverIzquierda() {
+        this.setX(this.getX() - this.getVelocidad());
+    }
 
-                this.y = Juego.edificios[i].getY() - this.alto;
-                this.estado = "colision";
-            }
-        }
+    public void moverDerecha() {
+        this.setX(this.getX() + this.getVelocidad());
     }
 
     public int getX() {
-        return x;
+        return this.rec.x;
     }
 
     public int getY() {
-        return y;
+        return this.rec.y;
     }
 
     public int getAncho() {
-        return ancho;
+        return this.rec.width;
     }
 
     public int getAlto() {
-        return alto;
+        return this.rec.height;
+    }
+
+    public Rectangle getRec() {
+        return this.rec;
     }
 
     public int getVelocidad() {
@@ -118,19 +71,19 @@ public class Mikasa {
     }
 
     public void setX(int x) {
-        this.x = x;
+        this.rec.x = x;
     }
 
     public void setY(int y) {
-        this.y = y;
+        this.rec.y = y;
     }
 
     public void setAncho(int ancho) {
-        this.ancho = ancho;
+        this.rec.width = ancho;
     }
 
     public void setAlto(int alto) {
-        this.alto = alto;
+        this.rec.height = alto;
     }
 
     public void setVelocidad(int velocidad) {

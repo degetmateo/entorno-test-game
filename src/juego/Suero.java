@@ -10,13 +10,13 @@ public class Suero {
     private Image img;
 
     public Suero(int x, int y) {
-        this.rec = new Rectangle(x, y, 70, 70);
+        this.rec = new Rectangle(x, y, 40, 40);
         this.img = Herramientas.cargarImagen("suero.png");
     }
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), 0, Color.GREEN);
-        entorno.dibujarImagen(this.getImg(), this.getX(), this.getY(), 0, 0.2);
+        entorno.dibujarImagen(this.getImg(), this.getX(), this.getY(), 0, 0.1);
     }
 
     public int getX() {

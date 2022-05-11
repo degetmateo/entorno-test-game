@@ -7,21 +7,15 @@ import java.awt.*;
 
 public class Mikasa {
     private Rectangle rec;
-    private Image imgArriba;
-    private Image imgAbajo;
-    private Image imgIzquierda;
-    private Image imgDerecha;
-    private Image imgEspecial;
+    private Image img = Herramientas.cargarImagen("mikasa-derecha.png");
+    private Image imgEspecial = Herramientas.cargarImagen("mikasa-titan.png");
     private int velocidad;
     private String estado = "normal";
-    private String direccion = "abajo";
+    private double angulo = 0;
+    private double modificador = 0.05;
 
     public Mikasa(int x, int y, int velocidad) {
         this.rec = new Rectangle(x, y, 70, 70);
-        this.imgArriba = Herramientas.cargarImagen("mikasa-arriba.png");
-        this.imgAbajo = Herramientas.cargarImagen("mikasa-abajo.png");
-        this.imgIzquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
-        this.imgDerecha = Herramientas.cargarImagen("mikasa-derecha.png");
         this.imgEspecial = Herramientas.cargarImagen("mikasa-titan.png");
         this.velocidad = velocidad;
     }
@@ -31,58 +25,36 @@ public class Mikasa {
         entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
 
         if (this.estado.equals("normal")) {
-            switch(this.getDireccion()) {
-                case "arriba":
-                    entorno.dibujarImagen(this.imgArriba, this.getX(), this.getY(), 0, 3);
-                break;
-                case "abajo":
-                    entorno.dibujarImagen(this.imgAbajo, this.getX(), this.getY(), 0, 3);
-                break;
-                case "izquierda":
-                    entorno.dibujarImagen(this.imgIzquierda, this.getX(), this.getY(), 0, 3);
-                break;
-                case "derecha":
-                    entorno.dibujarImagen(this.imgDerecha, this.getX(), this.getY(), 0, 3);
-                break;
-            }
+            entorno.dibujarImagen(this.img, this.getX(), this.getY(), this.getAngulo(), 3);
         } else if (this.estado.equals("especial")) {
-            switch(this.getDireccion()) {
-                case "arriba":
-                    entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), 0, 0.5);
-                break;
-                case "abajo":
-                    entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), 0, 0.5);
-                break;
-                case "izquierda":
-                    entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), 0, 0.5);
-                break;
-                case "derecha":
-                    entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), 0, 0.5);
-                break;
-            }
+            entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), this.getAngulo(), 0.5);
         }
     }
 
     // Funciones que mueven a Mikasa a un lado o a otro. Además verifican que no haya una colision con los edificios.
 
-    public void moverArriba() {
-        this.setY(this.getY() - this.getVelocidad());
-        this.setDireccion("arriba");
+    public void mover_adelante() {
+        double cos = Math.cos(this.getAngulo()) * 10;
+        double sen = Math.sin(this.getAngulo()) * 10;
+
+        this.setX(this.getX() + cos);
+        this.setY(this.getY() + sen);
     }
 
-    public void moverAbajo() {
-        this.setY(this.getY() + this.getVelocidad());
-        this.setDireccion("abajo");
+    public void mover_atras() {
+        double cos = Math.cos(this.getAngulo()) * 10;
+        double sen = Math.sin(this.getAngulo()) * 10;
+
+        this.setX(this.getX() - cos);
+        this.setY(this.getY() - sen);
     }
 
-    public void moverIzquierda() {
-        this.setX(this.getX() - this.getVelocidad());
-        this.setDireccion("izquierda");
+    public void girar_izquierda() {
+        this.setAngulo(this.getAngulo() - this.getModificador());
     }
 
-    public void moverDerecha() {
-        this.setX(this.getX() + this.getVelocidad());
-        this.setDireccion("derecha");
+    public void girar_derecha() {
+        this.setAngulo(this.getAngulo() + this.getModificador());
     }
 
     public int getX() {
@@ -113,16 +85,20 @@ public class Mikasa {
         return estado;
     }
 
-    public String getDireccion() {
-        return this.direccion;
+    public double getAngulo() {
+        return this.angulo;
     }
 
-    public void setX(int x) {
-        this.rec.x = x;
+    public double getModificador() {
+        return this.modificador;
     }
 
-    public void setY(int y) {
-        this.rec.y = y;
+    public void setX(double x) {
+        this.rec.x = (int) x;
+    }
+
+    public void setY(double y) {
+        this.rec.y = (int) y;
     }
 
     public void setAncho(int ancho) {
@@ -141,7 +117,7 @@ public class Mikasa {
         this.estado = estado;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
+    public void setAngulo(double angulo) {
+        this.angulo = angulo;
     }
 }

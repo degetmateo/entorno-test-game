@@ -86,13 +86,24 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setEstado("normal");
 			}
 
-			if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
-				this.disparar();
-			}
+			// if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
+			// 	this.disparar();
+			// }
 
 			if (this.cooldown_disparo > 0) this.cooldown_disparo--;
 
-			this.trayectoriaDisparos();
+			this.trayectoria_disparos();
+
+			if (this.disparos != null) {
+				for (int i = 0; i < this.disparos.length; i++) {
+					if (this.disparos[i] != null) {
+						if (this.disparos[i].getX() > entorno.ancho()) this.disparos[i] = null;
+						if (this.disparos[i].getX() < 0) this.disparos[i] = null;
+						if (this.disparos[i].getY() > entorno.ancho()) this.disparos[i] = null;
+						if (this.disparos[i].getX() < 0) this.disparos[i] = null;
+					}
+				}
+			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
 			entorno.escribirTexto("Has Perdido", 50, 60);
@@ -121,8 +132,7 @@ public class Juego extends InterfaceJuego {
 		this.entorno.dibujarImagen(this.imgInicio, 400, 300, 0, 1);
 	}
 
-	// Funcion que comprueba si hay una colisión.
-	// Recibe dos pares de vectores (x, y) y dos pares de dimensiones (ancho, alto).
+	// Funcion que comprueba si hay una colisión entre dos rectangulos.
 	public boolean colision(Rectangle a, Rectangle b) {
 		return (a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y);
 	}
@@ -140,7 +150,11 @@ public class Juego extends InterfaceJuego {
 			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
 			this.edificios[i] = new Edificio(ranX, ranY, 70, 70);
-		}	
+		}
+
+		// for (int i = 0; i < this.edificios.length; i++) {
+		// 	if (this.colision(this.edificios[i].getRec(), this.edificios[i + 1].getRec()))
+		// }
 	}
 
 	// Esta funcion cambia las posiciones de todos los edificios.
@@ -153,80 +167,83 @@ public class Juego extends InterfaceJuego {
 		int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
 		this.suero = new Suero(ranX, ranY);
+
+		for (Edificio edificio: this.edificios) {
+			if (this.colision(this.suero.getRec(), edificio.getRec())) {
+				ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+				ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
+		
+				this.suero = new Suero(ranX, ranY);
+			}
+		}
 	}
 
 	public void reiniciar_suero() {
 		this.generar_suero();
 	}
 
-	public void disparar() {
-		if (this.disparos == null) {
-			this.disparos = new Disparo[1];
-			this.disparos[0] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
-		} else {
-			Disparo[] disparos_nuevo = new Disparo[this.disparos.length + 1];
+	// public void disparar() {
+	// 	if (this.disparos == null) {
+	// 		this.disparos = new Disparo[1];
+	// 		this.disparos[0] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
+	// 	} else {
+	// 		Disparo[] disparos_nuevo = new Disparo[this.disparos.length + 1];
 
-			for (int i = 0; i < this.disparos.length; i++) {
-				disparos_nuevo[i] = this.disparos[i];
-			}
+	// 		for (int i = 0; i < this.disparos.length; i++) {
+	// 			disparos_nuevo[i] = this.disparos[i];
+	// 		}
 
-			disparos_nuevo[disparos_nuevo.length - 1] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
-			this.disparos = disparos_nuevo;
-		}
+	// 		disparos_nuevo[disparos_nuevo.length - 1] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
+	// 		this.disparos = disparos_nuevo;
+	// 	}
 
-		this.cooldown_disparo = 60;
-	}
+	// 	this.cooldown_disparo = 60;
+	// }
 
-	public void trayectoriaDisparos() {
+	public void trayectoria_disparos() {
 		if (this.disparos != null && this.disparos.length > 0) {
 			for (Disparo disparo: this.disparos) {
-				disparo.mover();
-				disparo.dibujar(this.entorno);
+				if (disparo != null) {
+					disparo.mover();
+					disparo.dibujar(this.entorno);
+				}
 			}
 		}
+	}
+
+	public void eliminar_disparo(int disparo) {
+		this.disparos[disparo] = null;
 	}
 
 	public void movimiento_mikasa() {
 		// Comprobar si una tecla de movimiento está presionada y mover a mikasa en consecuencia.
 		// Comprobar si mikasa colisiona con un edificio.
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) || this.entorno.estaPresionada('w')) {
-			this.mikasa.moverArriba();
+			this.mikasa.mover_adelante();
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.setY(this.mikasa.getY() + this.mikasa.getVelocidad());
+					this.mikasa.mover_atras();
 				}
 			}
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ABAJO) || this.entorno.estaPresionada('s')) {
-			this.mikasa.moverAbajo();
+			this.mikasa.mover_atras();
 
 			for (int i = 0; i < this.edificios.length; i++) {
 				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.setY(this.mikasa.getY() - this.mikasa.getVelocidad());
+					this.mikasa.mover_adelante();
 				}
 			}
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
-			this.mikasa.moverIzquierda();
-
-			for (int i = 0; i < this.edificios.length; i++) {
-				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.setX(this.mikasa.getX() + this.mikasa.getVelocidad());
-				}
-			}
+			this.mikasa.girar_izquierda();
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
-			this.mikasa.moverDerecha();
-
-			for (int i = 0; i < this.edificios.length; i++) {
-				if (this.colision(this.mikasa.getRec(), this.edificios[i].getRec())) {
-					this.mikasa.setX(this.mikasa.getX() - this.mikasa.getVelocidad());
-				}
-			}
+			this.mikasa.girar_derecha();
 		}
 
 		// Comprobar si Mikasa se sale de la pantalla. 

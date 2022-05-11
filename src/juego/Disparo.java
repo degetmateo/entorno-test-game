@@ -2,7 +2,6 @@ package juego;
 
 import java.awt.*;
 import entorno.Entorno;
-import entorno.Herramientas;
 
 public class Disparo {
 	private Rectangle rec;

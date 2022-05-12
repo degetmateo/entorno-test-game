@@ -15,6 +15,8 @@ public class Mikasa {
 
     private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
 
+    private Image img = this.img_derecha;
+
     private int velocidad;
     private String estado = "normal";
     private double angulo = 0;
@@ -26,17 +28,28 @@ public class Mikasa {
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.angulo, Color.WHITE);
-        
+        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
+
         if (this.estado.equals("normal")) {
-            entorno.dibujarImagen(this.img_derecha, this.rec.x, this.rec.y, this.angulo, 2.5);
+            // Cambiar la imagen de mikasa dependiendo de su angulo.
+            
+            // if (grados >= 0 && grados < 90) {
+            //     this.img = this.img_derecha;
+            // } else if (grados >= 90 && grados < 180) {
+            //     this.img = this.img_abajo;
+            // } else if (grados >= 180 && grados < 270) {
+            //     this.img = this.img_izquierda;
+            // } else if (grados >= 270 && grados < 360) {
+            //     this.img = this.img_arriba;
+            // }
+
+            entorno.dibujarImagen(this.img, this.rec.x, this.rec.y, this.angulo, 2.5);
         } else if (this.estado.equals("especial")) {
             entorno.dibujarImagen(this.img_especial, this.rec.x, this.rec.y, this.angulo, 0.4);
         }
     }
 
-    // Funciones que mueven a Mikasa a un lado o a otro.
-    // Además verifican que no haya una colision con los edificios.
+    // Funciones que mueven a Mikasa hacia adelante o hacia atrás.
     public void mover_adelante() {
         this.setX(this.getX() + (int) (Math.cos(this.angulo) * this.velocidad));
         this.setY(this.getY() + (int) (Math.sin(this.angulo) * this.velocidad));

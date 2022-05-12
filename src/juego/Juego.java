@@ -14,6 +14,7 @@ public class Juego extends InterfaceJuego {
 	private Mikasa mikasa;
 	private Edificio[] edificios;
 	private Disparo[] disparos;
+	private Titan[] titanes;
 	private Suero suero;
 	private int contador_habilidad = 0;
 	private int cooldown_disparo = 0;
@@ -25,9 +26,10 @@ public class Juego extends InterfaceJuego {
 		// ...
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.imgInicio = Herramientas.cargarImagen("tapa.jpg");
-		this.mikasa = new Mikasa(200, 200, 4);
+		this.mikasa = new Mikasa(entorno.ancho() / 2, entorno.alto() / 2, 4);
 		this.generar_edificios(4);
 		this.generar_suero();
+		this.generar_titanes(4);
 
 		// Inicia el juego!
 		this.entorno.iniciar();
@@ -86,23 +88,20 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setEstado("normal");
 			}
 
-			// if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
-			// 	this.disparar();
-			// }
+			// Se comprueba si se presiona la tecla espacio y si terminó el enfriamiento del disparo.
+			if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
+				this.disparar();
+			}
 
+			// Actualiza el enfriamiento del disparo.
 			if (this.cooldown_disparo > 0) this.cooldown_disparo--;
 
 			this.trayectoria_disparos();
 
-			if (this.disparos != null) {
-				for (int i = 0; i < this.disparos.length; i++) {
-					if (this.disparos[i] != null) {
-						if (this.disparos[i].getX() > entorno.ancho()) this.disparos[i] = null;
-						if (this.disparos[i].getX() < 0) this.disparos[i] = null;
-						if (this.disparos[i].getY() > entorno.ancho()) this.disparos[i] = null;
-						if (this.disparos[i].getX() < 0) this.disparos[i] = null;
-					}
-				}
+			for (int i = 0; i < this.titanes.length; i++) {
+				this.titanes[i].mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
+				this.titanes[i].mover_adelante();
+				this.titanes[i].dibujar(this.entorno);
 			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
@@ -146,6 +145,7 @@ public class Juego extends InterfaceJuego {
 	//	r.x - r.ancho/2 < s.x() + s.ancho()/2 &&
 	//	r.x + r.ancho/2 > s.x() - s.ancho()/2;
 
+	// Funcion que comprueba si hay una colisión entre dos rectangulos.
 	public boolean colision(Rectangle a, Rectangle b) {
 		return a.x + a.width / 2 > b.x - b.width / 2 &&
 			   a.x - a.width / 2 < b.x + b.width / 2 &&
@@ -168,6 +168,7 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < this.edificios.length; i++) {
 			if (this.colision(this.edificios[i].getRec(), this.mikasa.getRec())) {
 				generar_edificios(cantidad);
+				return;
 			}
 		}
 
@@ -178,6 +179,7 @@ public class Juego extends InterfaceJuego {
 				if (i != j) {
 					if (this.colision(this.edificios[i].getRec(), this.edificios[j].getRec())) {
 						generar_edificios(cantidad);
+						return;
 					}
 				}
 			}
@@ -200,12 +202,14 @@ public class Juego extends InterfaceJuego {
 		for (Edificio edificio: this.edificios) {
 			if (this.colision(this.suero.getRec(), edificio.getRec())) {
 				generar_suero();
+				return;
 			}
 		}
 
 		// Se comprueba que el suero no se solape con mikasa.
 		if (this.colision(this.suero.getRec(), this.mikasa.getRec())) {
 			generar_suero();
+			return;
 		}
 	}
 
@@ -214,25 +218,94 @@ public class Juego extends InterfaceJuego {
 		this.generar_suero();
 	}
 
-	// public void disparar() {
-	// 	if (this.disparos == null) {
-	// 		this.disparos = new Disparo[1];
-	// 		this.disparos[0] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
-	// 	} else {
-	// 		Disparo[] disparos_nuevo = new Disparo[this.disparos.length + 1];
+	public void generar_titanes(int cantidad) {
+		this.titanes = new Titan[cantidad];
 
-	// 		for (int i = 0; i < this.disparos.length; i++) {
-	// 			disparos_nuevo[i] = this.disparos[i];
-	// 		}
+		for (int i = 0; i < this.titanes.length; i++) {
+			int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
-	// 		disparos_nuevo[disparos_nuevo.length - 1] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getDireccion());
-	// 		this.disparos = disparos_nuevo;
-	// 	}
+			this.titanes[i] = new Titan(ranX, ranY, this.mikasa.getAngulo() + 180);
+		}
 
-	// 	this.cooldown_disparo = 60;
-	// }
+		// Se comprueba que los titanes no choquen con mikasa al inicio.
+		for (int i = 0; i < this.titanes.length; i++) {
+			if (this.colision(this.titanes[i].getRec(), this.mikasa.getRec())) {
+				generar_titanes(cantidad);
+				return;
+			}
+		}
 
+		// Se comprueba que los titanes no choquen con los edificios.
+		for (int i = 0; i < this.titanes.length; i++) {
+			for (Edificio edificio: this.edificios) {
+				if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
+					generar_titanes(cantidad);
+					return;
+				}
+			}
+		}
+
+		// Se comprueba que los titanes no se solapen.
+		// De lo contrario se vuelve a llamar a la función.
+		for (int i = 0; i < this.titanes.length; i++) {
+			for (int j = 0; j < this.titanes.length; j++) {
+				if (i != j) {
+					if (this.colision(this.titanes[i].getRec(), this.titanes[j].getRec())) {
+						generar_titanes(cantidad);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	// Funcion que genera un nuevo disparo que mira hacia el angulo en el está mirando mikasa.
+	public void disparar() {
+		// Primero se comprueba si la lista de disparos es null.
+		// Si es null se le asigna el valor de una lista y se crea el primer Disparo.
+		if (this.disparos == null) {
+			this.disparos = new Disparo[1];
+			this.disparos[0] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getAngulo());
+		} else {
+			// Si ya está creada la lista de disparos, se crea una nueva lista con un tamaño más grande.
+			// De esta forma, podemos insertar un nuevo disparo.
+			Disparo[] disparos_nuevo = new Disparo[this.disparos.length + 1];
+
+			for (int i = 0; i < this.disparos.length; i++) {
+				disparos_nuevo[i] = this.disparos[i];
+			}
+
+			disparos_nuevo[disparos_nuevo.length - 1] = new Disparo(this.mikasa.getX(), this.mikasa.getY(), this.mikasa.getAngulo());
+			this.disparos = disparos_nuevo;
+		}
+
+		// Le asignamos un valor al enfriamiento del disparo para que no se puedan disparar más de una vez por segundo.
+		this.cooldown_disparo = 60;
+	}
+
+	// Funcion que actualiza los disparos y los va moviendo hacia angulo con el que se crearon.
+	// Además, si se salen de la ventana o chocan con algun edificio los elimina.
 	public void trayectoria_disparos() {
+		if (this.disparos != null) {
+			for (int i = 0; i < this.disparos.length; i++) {
+				if (this.disparos[i] != null) {
+					if (this.disparos[i].getX() > entorno.ancho()) this.disparos[i] = null;
+					if (this.disparos[i].getX() < 0) this.disparos[i] = null;
+					if (this.disparos[i].getY() > entorno.ancho()) this.disparos[i] = null;
+					if (this.disparos[i].getX() < 0) this.disparos[i] = null;
+				}
+
+				for (int j = 0; j < this.edificios.length; j++) {
+					if (this.disparos[i] != null) {
+						if (this.colision(this.disparos[i].getRec(), this.edificios[j].getRec())) {
+							this.disparos[i] = null;
+						}
+					}
+				}
+			}
+		}
+
 		if (this.disparos != null && this.disparos.length > 0) {
 			for (Disparo disparo: this.disparos) {
 				if (disparo != null) {
@@ -241,10 +314,6 @@ public class Juego extends InterfaceJuego {
 				}
 			}
 		}
-	}
-
-	public void eliminar_disparo(int disparo) {
-		this.disparos[disparo] = null;
 	}
 
 	public void movimiento_mikasa() {

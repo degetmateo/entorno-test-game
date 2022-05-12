@@ -6,29 +6,21 @@ import entorno.Entorno;
 public class Disparo {
 	private Rectangle rec;
     private Image img;
-    private String direccion;
-    private int velocidad = 3;
+    private int velocidad = 6;
+    private double angulo;
 
-    public Disparo(int x, int y, String direccion) {
-        this.rec = new Rectangle(x, y, 20, 20);
-        this.direccion = direccion;
+    public Disparo(int x, int y, double angulo) {
+        this.rec = new Rectangle(x, y, 30, 15);
+        this.angulo = angulo;
     }
 
 	public void dibujar(Entorno entorno) {
-	    entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), 0, Color.CYAN);
+	    entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), this.angulo, Color.CYAN);
 	}
 	
     public void mover() {
-	    switch(this.getDireccion()) {
-            case "arriba": this.setY(this.getY() - this.getVelocidad());
-            break;
-            case "abajo": this.setY(this.getY() + this.getVelocidad());
-            break;
-            case "izquierda": this.setX(this.getX() - this.getVelocidad());
-            break;
-            case "derecha": this.setX(this.getX() + this.getVelocidad());
-            break;
-        }
+        this.setX(this.getX() + (int) (Math.cos(this.angulo) * this.velocidad));
+        this.setY(this.getY() + (int) (Math.sin(this.angulo) * this.velocidad));
     }
 
     public Rectangle getRec() {
@@ -55,8 +47,8 @@ public class Disparo {
         return this.rec.height;
     }
 
-    public String getDireccion() {
-        return this.direccion;
+    public double getAngulo() {
+        return this.angulo;
     }
 
     public int getVelocidad() {
@@ -69,9 +61,5 @@ public class Disparo {
 
     public void setY(int y) {
         this.rec.y = y;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
     }
 }

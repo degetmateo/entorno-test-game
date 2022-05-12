@@ -7,57 +7,48 @@ import java.awt.*;
 
 public class Mikasa {
     private Rectangle rec;
-    private Image img = Herramientas.cargarImagen("mikasa-derecha.png");
-    private Image imgEspecial = Herramientas.cargarImagen("mikasa-titan.png");
+
+    private Image img_arriba = Herramientas.cargarImagen("mikasa-arriba.png");
+    private Image img_abajo = Herramientas.cargarImagen("mikasa-abajo.png");
+    private Image img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
+    private Image img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
+
+    private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
+
     private int velocidad;
     private String estado = "normal";
     private double angulo = 0;
 
     public Mikasa(int x, int y, int velocidad) {
         this.rec = new Rectangle(x, y, 70, 70);
-        this.imgEspecial = Herramientas.cargarImagen("mikasa-titan.png");
         this.velocidad = velocidad;
     }
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.getAngulo(), Color.WHITE);
-
+        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.angulo, Color.WHITE);
+        
         if (this.estado.equals("normal")) {
-            entorno.dibujarImagen(this.img, this.getX(), this.getY(), this.getAngulo(), 3);
+            entorno.dibujarImagen(this.img_derecha, this.rec.x, this.rec.y, this.angulo, 2.5);
         } else if (this.estado.equals("especial")) {
-            entorno.dibujarImagen(this.imgEspecial, this.getX(), this.getY(), this.getAngulo(), 0.5);
+            entorno.dibujarImagen(this.img_especial, this.rec.x, this.rec.y, this.angulo, 0.4);
         }
     }
 
-    // Funciones que mueven a Mikasa a un lado o a otro. Además verifican que no haya una colision con los edificios.
-
+    // Funciones que mueven a Mikasa a un lado o a otro.
+    // Además verifican que no haya una colision con los edificios.
     public void mover_adelante() {
-        double cos = Math.cos(this.getAngulo()) * 10;
-        double sen = Math.sin(this.getAngulo()) * 10;
-
-        this.setX(this.getX() + cos);
-        this.setY(this.getY() + sen);
+        this.setX(this.getX() + (int) (Math.cos(this.angulo) * this.velocidad));
+        this.setY(this.getY() + (int) (Math.sin(this.angulo) * this.velocidad));
     }
 
     public void mover_atras() {
-        double cos = Math.cos(this.getAngulo()) * 10;
-        double sen = Math.sin(this.getAngulo()) * 10;
-
-        this.setX(this.getX() - cos);
-        this.setY(this.getY() - sen);
+        this.setX(this.getX() - (int) (Math.cos(this.angulo) * this.velocidad));
+        this.setY(this.getY() - (int) (Math.sin(this.angulo) * this.velocidad));
     }
 
     public void girar(double modificador) {
-        this.setAngulo(this.getAngulo() + modificador);
-
-        if (this.getAngulo() < 0) {
-            this.setAngulo(this.getAngulo() + 2 * Math.PI);
-        }
-
-        if (this.getAngulo() > 2 * Math.PI) {
-            this.setAngulo(this.getAngulo() - 2 * Math.PI);
-        }
+        this.setAngulo(this.angulo + modificador);
     }
 
     public int getX() {
@@ -81,11 +72,11 @@ public class Mikasa {
     }
 
     public int getVelocidad() {
-        return velocidad;
+        return this.velocidad;
     }
 
     public String getEstado() {
-        return estado;
+        return this.estado;
     }
 
     public double getAngulo() {
@@ -118,5 +109,13 @@ public class Mikasa {
 
     public void setAngulo(double angulo) {
         this.angulo = angulo;
+
+        if (this.angulo < 0) {
+			this.angulo += 2 * Math.PI;
+		}
+
+        if (this.angulo > 2 * Math.PI) {
+        	this.angulo -= 2 * Math.PI;
+        }
     }
 }

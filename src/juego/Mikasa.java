@@ -8,9 +8,9 @@ import java.awt.*;
 public class Mikasa {
     private Rectangle rec;
 
-    private Image img_arriba = Herramientas.cargarImagen("mikasa-arriba.png");
-    private Image img_abajo = Herramientas.cargarImagen("mikasa-abajo.png");
-    private Image img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
+    // private Image img_arriba = Herramientas.cargarImagen("mikasa-arriba.png");
+    // private Image img_abajo = Herramientas.cargarImagen("mikasa-abajo.png");
+    // private Image img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
     private Image img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
 
     private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
@@ -32,7 +32,7 @@ public class Mikasa {
 
         if (this.estado.equals("normal")) {
             // Cambiar la imagen de mikasa dependiendo de su angulo.
-            
+
             // if (grados >= 0 && grados < 90) {
             //     this.img = this.img_derecha;
             // } else if (grados >= 90 && grados < 180) {

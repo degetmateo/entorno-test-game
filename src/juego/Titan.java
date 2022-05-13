@@ -1,12 +1,12 @@
 package juego;
 
 import java.awt.*;
-import java.util.concurrent.ThreadLocalRandom;
+// import java.util.concurrent.ThreadLocalRandom;
 import entorno.*;
 
 public class Titan {
     private Rectangle rec;
-    private int velocidad = (int) ThreadLocalRandom.current().nextInt(2, 4);
+    private int velocidad = 2;
     private double angulo;
 
     public Titan(int x, int y, double angulo) {
@@ -21,6 +21,11 @@ public class Titan {
     public void mover_adelante() {
         this.setX(this.getX() + (int) (Math.cos(this.angulo) * this.velocidad));
         this.setY(this.getY() + (int) (Math.sin(this.angulo) * this.velocidad));
+    }
+
+    public void mover_atras() {
+        this.setX(this.getX() - (int) (Math.cos(this.angulo) * this.velocidad));
+        this.setY(this.getY() - (int) (Math.sin(this.angulo) * this.velocidad));
     }
 
     public void mirar_mikasa(int mx, int my) {

@@ -18,6 +18,7 @@ public class Juego extends InterfaceJuego {
 	private Suero suero;
 	private int contador_habilidad = 0;
 	private int cooldown_disparo = 0;
+	private int contador_titan = 300;
 	
 	public Juego() {
 		// Inicializa el objeto entorno
@@ -99,9 +100,25 @@ public class Juego extends InterfaceJuego {
 			this.trayectoria_disparos();
 
 			for (int i = 0; i < this.titanes.length; i++) {
-				this.titanes[i].mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
-				this.titanes[i].mover_adelante();
-				this.titanes[i].dibujar(this.entorno);
+				if (this.titanes[i] != null) {
+					this.titanes[i].mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
+					this.titanes[i].mover_adelante();
+	
+					for (Edificio edificio: this.edificios) {
+						if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
+							this.titanes[i].mover_atras();
+						}
+					}
+	
+					this.titanes[i].dibujar(this.entorno);
+				}
+			}
+
+			if (this.contador_titan <= 0) {
+				this.generar_titan();
+				this.contador_titan = 300;
+			} else {
+				this.contador_titan--;
 			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
@@ -117,6 +134,7 @@ public class Juego extends InterfaceJuego {
 				this.mikasa.setY(entorno.alto() / 2);
 				this.reiniciar_edificios();
 				this.reiniciar_suero();
+				this.reiniciar_titanes();
 
 				this.estado = "juego";
 			}
@@ -260,6 +278,39 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
+	// Esta funcion genera un nuevo titán.
+	public void generar_titan() {
+		Titan[] titanes_nuevo = new Titan[this.titanes.length + 1];
+
+		for (int i = 0; i < this.titanes.length; i++) {
+			titanes_nuevo[i] = this.titanes[i];
+		}
+
+		int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+		int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
+
+		titanes_nuevo[this.titanes.length] = new Titan(ranX, ranY, this.mikasa.getAngulo() + 180);
+
+		if (this.colision(titanes_nuevo[this.titanes.length].getRec(), this.mikasa.getRec())) {
+			generar_titan();
+			return;
+		}
+
+		for (Edificio edificio: this.edificios) {
+			if (this.colision(titanes_nuevo[this.titanes.length].getRec(), edificio.getRec())) {
+				generar_titan();
+				return;
+			}
+		}
+
+		this.titanes = titanes_nuevo;
+	}
+
+	// Esta funcion reinicia los titanes.
+	public void reiniciar_titanes() {
+		this.generar_titanes(this.titanes.length);
+	}
+
 	// Funcion que genera un nuevo disparo que mira hacia el angulo en el está mirando mikasa.
 	public void disparar() {
 		// Primero se comprueba si la lista de disparos es null.
@@ -303,6 +354,15 @@ public class Juego extends InterfaceJuego {
 						}
 					}
 				}
+
+				for (int h = 0; h < this.titanes.length; h++) {
+					if (this.disparos[i] != null && this.titanes[h] != null) {
+						if (this.colision(this.disparos[i].getRec(), this.titanes[h].getRec())) {
+							this.disparos[i] = null;
+							this.titanes[h] = null;
+						}
+					}
+				}
 			}
 		}
 
@@ -342,11 +402,11 @@ public class Juego extends InterfaceJuego {
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
-			this.mikasa.girar(Extras.radianes(-4));
+			this.mikasa.girar(Extras.radianes(-6));
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
-			this.mikasa.girar(Extras.radianes(4));
+			this.mikasa.girar(Extras.radianes(6));
 		}
 
 		// Comprobar si Mikasa se sale de la pantalla. 

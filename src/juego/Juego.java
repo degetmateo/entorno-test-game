@@ -28,7 +28,7 @@ public class Juego extends InterfaceJuego {
 		this.imgFondo = Herramientas.cargarImagen("img-fondo.jpg");
 		this.imgInicio = Herramientas.cargarImagen("tapa.jpg");
 		this.mikasa = new Mikasa(entorno.ancho() / 2, entorno.alto() / 2, 4);
-		this.generar_edificios(4);
+		this.generar_edificios();
 		this.generar_suero();
 		this.generar_titanes(4);
 
@@ -146,7 +146,7 @@ public class Juego extends InterfaceJuego {
 			if (entorno.estaPresionada(entorno.TECLA_ENTER)) {
 				this.mikasa.setX(entorno.ancho() / 2);
 				this.mikasa.setY(entorno.alto() / 2);
-				this.reiniciar_edificios();
+				// this.reiniciar_edificios();
 				this.reiniciar_suero();
 				this.reiniciar_titanes();
 
@@ -186,42 +186,47 @@ public class Juego extends InterfaceJuego {
 	}
 
 	// Esta funcion genera edificios (obstáculos) en una posición al azar.
-	public void generar_edificios(int cantidad) {
-		this.edificios = new Edificio[cantidad];
+	public void generar_edificios() {
+		this.edificios = new Edificio[4];
 
-		for (int i = 0; i < this.edificios.length; i++) {
-			int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
-			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
+		this.edificios[0] = new Edificio(200, 150, 70, 70);
+		this.edificios[1] = new Edificio(600, 450, 70, 70);
+		this.edificios[2] = new Edificio(200, 450, 70, 70);
+		this.edificios[3] = new Edificio(600, 150, 70, 70);
 
-			this.edificios[i] = new Edificio(ranX, ranY, 70, 70);
-		}
+		// for (int i = 0; i < this.edificios.length; i++) {
+		// 	int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+		// 	int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
+
+		// 	this.edificios[i] = new Edificio(ranX, ranY, 70, 70);
+		// }
 
 		// Se comprueba que los edificios no choquen con mikasa al inicio.
-		for (int i = 0; i < this.edificios.length; i++) {
-			if (this.colision(this.edificios[i].getRec(), this.mikasa.getRec())) {
-				generar_edificios(cantidad);
-				return;
-			}
-		}
+		// for (int i = 0; i < this.edificios.length; i++) {
+		// 	if (this.colision(this.edificios[i].getRec(), this.mikasa.getRec())) {
+		// 		generar_edificios(cantidad);
+		// 		return;
+		// 	}
+		// }
 
 		// Se comprueba que los edificios no se solapen.
 		// De lo contrario se vuelve a llamar a la función.
-		for (int i = 0; i < this.edificios.length; i++) {
-			for (int j = 0; j < this.edificios.length; j++) {
-				if (i != j) {
-					if (this.colision(this.edificios[i].getRec(), this.edificios[j].getRec())) {
-						generar_edificios(cantidad);
-						return;
-					}
-				}
-			}
-		}
+		// for (int i = 0; i < this.edificios.length; i++) {
+		// 	for (int j = 0; j < this.edificios.length; j++) {
+		// 		if (i != j) {
+		// 			if (this.colision(this.edificios[i].getRec(), this.edificios[j].getRec())) {
+		// 				generar_edificios(cantidad);
+		// 				return;
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 	// Esta funcion reinicia los edificios.
-	public void reiniciar_edificios() {
-		this.generar_edificios(this.edificios.length);
-	}
+	// public void reiniciar_edificios() {
+	// 	this.generar_edificios(this.edificios.length);
+	// }
 	
 	// Esta funcion genera el suero en una posición al azar.
 	public void generar_suero() {

@@ -1,7 +1,7 @@
 package juego;
 
 import entorno.Entorno;
-import entorno.Herramientas;
+// import entorno.Herramientas;
 
 import java.awt.*;
 
@@ -12,10 +12,10 @@ public class Mikasa {
     // private Image img_abajo = Herramientas.cargarImagen("mikasa-abajo.png");
     // private Image img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
     
-    private Image img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
-    private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
+    // private Image img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
+    // private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
 
-    private Image img = this.img_derecha;
+    // private Image img = this.img_derecha;
 
     private int velocidad;
     private String estado = "normal";
@@ -28,7 +28,7 @@ public class Mikasa {
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.angulo, Color.WHITE);
+        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
 
         if (this.estado.equals("normal")) {
             // Cambiar la imagen de mikasa dependiendo de su angulo.

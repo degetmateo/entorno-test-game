@@ -16,6 +16,7 @@ public class Titan {
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), this.angulo, Color.RED);
+        entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.PINK);
     }
 
     public void mover_adelante() {
@@ -33,6 +34,15 @@ public class Titan {
         double dy = my - this.getY();
 
         this.setAngulo(Math.atan2(dy, dx));
+    }
+
+    public void rodear(Rectangle r) {
+        double dx = r.x - this.getX();
+        double dy = r.y - this.getY();
+
+        this.setAngulo(Math.atan2(dy, dx) + Math.PI / 2);
+        
+        this.mover_adelante();
     }
 
     public int getX() {
@@ -57,6 +67,10 @@ public class Titan {
 
     public int getVelocidad() {
         return this.velocidad;
+    }
+
+    public double getAngulo() {
+        return this.angulo;
     }
 
     public void setX(int x) {

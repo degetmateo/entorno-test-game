@@ -6,7 +6,7 @@ import entorno.Entorno;
 public class Disparo {
 	private Rectangle rec;
     private Image img;
-    private int velocidad = 6;
+    private int velocidad = 8;
     private double angulo;
 
     public Disparo(int x, int y, double angulo) {

@@ -11,8 +11,8 @@ public class Mikasa {
     // private Image img_arriba = Herramientas.cargarImagen("mikasa-arriba.png");
     // private Image img_abajo = Herramientas.cargarImagen("mikasa-abajo.png");
     // private Image img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
+    
     private Image img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
-
     private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
 
     private Image img = this.img_derecha;
@@ -28,7 +28,7 @@ public class Mikasa {
 
     // Comprueba el estado de mikasa y dependiendo de cuál sea le cambia el color.
     public void dibujar(Entorno entorno) {
-        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
+        entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, this.angulo, Color.WHITE);
 
         if (this.estado.equals("normal")) {
             // Cambiar la imagen de mikasa dependiendo de su angulo.
@@ -43,9 +43,11 @@ public class Mikasa {
             //     this.img = this.img_arriba;
             // }
 
-            entorno.dibujarImagen(this.img, this.rec.x, this.rec.y, this.angulo, 2.5);
+            //entorno.dibujarImagen(this.img, this.rec.x, this.rec.y, this.angulo, 2.5);
+            entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.PINK);
         } else if (this.estado.equals("especial")) {
-            entorno.dibujarImagen(this.img_especial, this.rec.x, this.rec.y, this.angulo, 0.4);
+            //entorno.dibujarImagen(this.img_especial, this.rec.x, this.rec.y, this.angulo, 0.4);
+            entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.ORANGE);
         }
     }
 

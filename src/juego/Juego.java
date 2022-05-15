@@ -70,7 +70,7 @@ public class Juego extends InterfaceJuego {
 			// Verificar si el suero aún existe.
 			if (this.suero != null) {
 				// Dibujar el suero.
-				this.suero.dibujar(entorno);
+				this.suero.dibujar(this.entorno);
 
 				// Verificar si hay una colisión con el suero.
 				if (this.colision(this.mikasa.getRec(), this.suero.getRec())) {
@@ -97,21 +97,35 @@ public class Juego extends InterfaceJuego {
 			// Actualiza el enfriamiento del disparo.
 			if (this.cooldown_disparo > 0) this.cooldown_disparo--;
 
-			this.trayectoria_disparos();
+			if (this.disparos != null) {
+				this.trayectoria_disparos();
+
+				for (Disparo disparo: this.disparos) {
+					disparo.mover();
+					disparo.dibujar(this.entorno);
+				}
+			}
 
 			for (int i = 0; i < this.titanes.length; i++) {
-				if (this.titanes[i] != null) {
-					this.titanes[i].mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
-					this.titanes[i].mover_adelante();
-	
-					for (Edificio edificio: this.edificios) {
-						if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
-							this.titanes[i].mover_atras();
-						}
+				this.titanes[i].mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
+				this.titanes[i].mover_adelante();
+
+				for (Edificio edificio: this.edificios) {
+					if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
+						this.titanes[i].mover_atras();
+						this.titanes[i].rodear(edificio.getRec());
+						break;
 					}
-	
-					this.titanes[i].dibujar(this.entorno);
 				}
+
+				for (int j = 0; j < this.titanes.length; j++) {
+					if (i != j && this.colision(this.titanes[i].getRec(), this.titanes[j].getRec())) {
+						this.titanes[i].mover_atras();
+						break;
+					}
+				}
+
+				this.titanes[i].dibujar(this.entorno);
 			}
 
 			if (this.contador_titan <= 0) {
@@ -311,6 +325,22 @@ public class Juego extends InterfaceJuego {
 		this.generar_titanes(this.titanes.length);
 	}
 
+	// Esta funcion elimina un titán en la lista de titanes (this.titanes).
+	// Para ello recibe la posición en la que se encuentra, y crea una nueva lista donde ese titán no existe.
+	public void eliminar_titan(int pos) {
+		Titan[] titanes_nuevo = new Titan[this.titanes.length - 1];
+
+		for (int i = 0; i < pos; i++) {
+			titanes_nuevo[i] = this.titanes[i];
+		}
+
+		for (int i = pos; i < this.titanes.length - 1; i++) {
+			titanes_nuevo[i] = this.titanes[i + 1];
+		}
+
+		this.titanes = titanes_nuevo;
+	}
+
 	// Funcion que genera un nuevo disparo que mira hacia el angulo en el está mirando mikasa.
 	public void disparar() {
 		// Primero se comprueba si la lista de disparos es null.
@@ -338,42 +368,58 @@ public class Juego extends InterfaceJuego {
 	// Funcion que actualiza los disparos y los va moviendo hacia angulo con el que se crearon.
 	// Además, si se salen de la ventana o chocan con algun edificio los elimina.
 	public void trayectoria_disparos() {
-		if (this.disparos != null) {
-			for (int i = 0; i < this.disparos.length; i++) {
-				if (this.disparos[i] != null) {
-					if (this.disparos[i].getX() > entorno.ancho()) this.disparos[i] = null;
-					if (this.disparos[i].getX() < 0) this.disparos[i] = null;
-					if (this.disparos[i].getY() > entorno.ancho()) this.disparos[i] = null;
-					if (this.disparos[i].getX() < 0) this.disparos[i] = null;
-				}
+		for (int i = 0; i < this.disparos.length; i++) {
+			if (this.disparos[i].getX() > entorno.ancho()) {
+				this.eliminar_disparo(i);
+				return;
+			}
 
-				for (int j = 0; j < this.edificios.length; j++) {
-					if (this.disparos[i] != null) {
-						if (this.colision(this.disparos[i].getRec(), this.edificios[j].getRec())) {
-							this.disparos[i] = null;
-						}
-					}
-				}
+			if (this.disparos[i].getX() < 0) {
+				this.eliminar_disparo(i);
+				return;
+			}
 
-				for (int h = 0; h < this.titanes.length; h++) {
-					if (this.disparos[i] != null && this.titanes[h] != null) {
-						if (this.colision(this.disparos[i].getRec(), this.titanes[h].getRec())) {
-							this.disparos[i] = null;
-							this.titanes[h] = null;
-						}
-					}
+			if (this.disparos[i].getY() > entorno.ancho()) {
+				this.eliminar_disparo(i);
+				return;
+			}
+
+			if (this.disparos[i].getX() < 0) {
+				this.eliminar_disparo(i);
+				return;
+			}
+
+			for (int e = 0; e < this.edificios.length; e++) {
+				if (this.colision(this.disparos[i].getRec(), this.edificios[e].getRec())) {
+					this.eliminar_disparo(i);
+					return;
+				}
+			}
+
+			for (int h = 0; h < this.titanes.length; h++) {
+				if (this.colision(this.disparos[i].getRec(), this.titanes[h].getRec())) {
+					this.eliminar_disparo(i);
+					this.eliminar_titan(h);
+					return;
 				}
 			}
 		}
+	}
 
-		if (this.disparos != null && this.disparos.length > 0) {
-			for (Disparo disparo: this.disparos) {
-				if (disparo != null) {
-					disparo.mover();
-					disparo.dibujar(this.entorno);
-				}
-			}
+	// Esta funcion elimina un disparo en la lista de disparos (this.disparos).
+	// Para ello recibe la posición en la que se encuentra, y crea una nueva lista donde ese disparo no existe.
+	public void eliminar_disparo(int pos) {
+		Disparo[] disparos_nuevo = new Disparo[this.disparos.length - 1];
+
+		for (int i = 0; i < pos; i++) {
+			disparos_nuevo[i] = this.disparos[i];
 		}
+
+		for (int i = pos; i < this.disparos.length - 1; i++) {
+			disparos_nuevo[i] = this.disparos[i + 1];
+		}
+
+		this.disparos = disparos_nuevo;
 	}
 
 	public void movimiento_mikasa() {
@@ -402,11 +448,11 @@ public class Juego extends InterfaceJuego {
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
-			this.mikasa.girar(Extras.radianes(-6));
+			this.mikasa.girar(Extras.radianes(-5));
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
-			this.mikasa.girar(Extras.radianes(6));
+			this.mikasa.girar(Extras.radianes(5));
 		}
 
 		// Comprobar si Mikasa se sale de la pantalla. 

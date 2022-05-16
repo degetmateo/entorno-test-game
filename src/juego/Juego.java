@@ -19,6 +19,7 @@ public class Juego extends InterfaceJuego {
 	private int contador_habilidad = 0;
 	private int cooldown_disparo = 0;
 	private int contador_titan = 300;
+	private int cooldown_suero;
 	
 	public Juego() {
 		// Inicializa el objeto entorno
@@ -133,6 +134,23 @@ public class Juego extends InterfaceJuego {
 				this.contador_titan = 300;
 			} else {
 				this.contador_titan--;
+			}
+
+			if (this.mikasa.getEstado().equals("especial")) {
+				for (int i = 0; i < this.titanes.length; i++) {
+					if (this.colision(this.mikasa.getRec(), this.titanes[i].getRec())) {
+						this.eliminar_titan(i);
+					}
+				}
+			}
+
+			if (this.suero == null) {
+				this.cooldown_suero--;
+				if (this.cooldown_suero <= 0) {
+					this.generar_suero();
+					this.cooldown_suero = 1500;
+					return;
+				}
 			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);

@@ -11,15 +11,16 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	private Image imgFondo;
 	private Image imgInicio;
+	private Image imgCorazon = Herramientas.cargarImagen("corazon.png");
 	private Mikasa mikasa;
 	private Edificio[] edificios;
 	private Disparo[] disparos;
 	private Titan[] titanes;
 	private Suero suero;
-	private int contador_habilidad = 0;
+	public int titanesEliminados=0;
 	private int cooldown_disparo = 0;
 	private int contador_titan = 300;
-	private int cooldown_suero = 1500;
+	private int cooldown_suero=1500;
 	
 	public Juego() {
 		// Inicializa el objeto entorno
@@ -31,10 +32,11 @@ public class Juego extends InterfaceJuego {
 		this.mikasa = new Mikasa(entorno.ancho() / 2, entorno.alto() / 2, 4);
 		this.generar_edificios();
 		this.generar_suero();
-		this.generar_titanes(4);
+	   	this.generar_titanes(4);
 
 		// Inicia el juego!
 		this.entorno.iniciar();
+		
 	}
 
 	/**
@@ -75,20 +77,14 @@ public class Juego extends InterfaceJuego {
 
 				// Verificar si hay una colisión con el suero.
 				if (this.colision(this.mikasa.getRec(), this.suero.getRec())) {
-					// Si Mikasa colisiona con el suero este se elimina y se cambia el varlor de contador_habilidad.
+					// Si Mikasa colisiona con el suero este se elimina y se cambia el valor de contador_habilidad.
 					this.suero = null;
-					this.contador_habilidad = 900;
+					this.mikasa.setEstado("especial");
 				}
 			}
 
 			// Si el contador_habilidad es mayor a cero mikasa gana el estado "especial" y cambia de color.
 			// Además, el contador_habilidad irá disminuyendo en cada tick.
-			if (this.contador_habilidad > 0) {
-				this.contador_habilidad--;
-				this.mikasa.setEstado("especial");
-			} else {
-				this.mikasa.setEstado("normal");
-			}
 
 			// Se comprueba si se presiona la tecla espacio y si terminó el enfriamiento del disparo.
 			if (this.cooldown_disparo == 0 && this.entorno.estaPresionada(this.entorno.TECLA_ESPACIO)) {
@@ -137,11 +133,14 @@ public class Juego extends InterfaceJuego {
 					this.contador_titan--;
 				}
 			}
-
+			
 			if (this.mikasa.getEstado().equals("especial")) {
 				for (int i = 0; i < this.titanes.length; i++) {
 					if (this.colision(this.mikasa.getRec(), this.titanes[i].getRec())) {
 						this.eliminar_titan(i);
+						titanesEliminados+=1;
+						this.mikasa.setEstado("normal");
+						System.out.println(titanesEliminados);
 					}
 				}
 			}
@@ -153,6 +152,16 @@ public class Juego extends InterfaceJuego {
 					this.cooldown_suero = 1500;
 					return;
 				}
+			}
+
+			if (this.mikasa.getEstado().equals("normal")) {
+				this.comprobar_daño();
+			}
+			
+			// dibujar corazones de vidas en pantalla 
+
+			for (int i = 1; i <= this.mikasa.getVidas(); i++) {
+				this.entorno.dibujarImagen(this.imgCorazon, 60 * i, 500, 0, 0.05);
 			}
 		} else if (this.estado.equals("final")) {
 			entorno.cambiarFont("Arial", 32, Color.white);
@@ -169,6 +178,8 @@ public class Juego extends InterfaceJuego {
 				// this.reiniciar_edificios();
 				this.reiniciar_suero();
 				this.reiniciar_titanes();
+				this.mikasa.setVidas(3);
+				this.titanesEliminados = 0;
 
 				this.estado = "juego";
 			}
@@ -177,6 +188,9 @@ public class Juego extends InterfaceJuego {
 
 	public void dibujar_fondo() {
 		this.entorno.dibujarImagen(this.imgFondo, 400, 300, 0, 1);
+		entorno.cambiarFont("Arial", 20, Color.black);
+		this.entorno.escribirTexto("ENEMIGOS ELIMINADOS: ", 8, 580);
+		this.entorno.escribirTexto(Integer.toString(titanesEliminados), 250, 580);
 	}
 
 	public void dibujar_inicio() {
@@ -275,46 +289,64 @@ public class Juego extends InterfaceJuego {
 		this.generar_suero();
 	}
 
+	public void comprobar_daño() {
+		for (int i = 0; i < this.titanes.length; i++) {
+			if (this.colision(this.mikasa.getRec(), this.titanes[i].getRec())) {
+				this.mikasa.setVidas(this.mikasa.getVidas() - 1);
+				this.eliminar_titan(i);
+
+				if (this.mikasa.getVidas() <= 0) {
+					this.estado = "final";
+				}
+			}
+		}
+	}
+
+	//choque con edificios  MAR
+	public boolean choqueTitanConEdificios (Titan titan) {
+		for (Edificio edificio: this.edificios) {
+			if (this.colision(titan.getRec(), edificio.getRec())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	//choque titanes con Mikasa MAR
+	public boolean choqueTitanConMikasa (Titan titan){
+			return this.colision(titan.getRec(), this.mikasa.getRec());
+}
+	
+	//Interseccion de titanes MAR
+	public boolean interseccionTitan(Titan titan, int indice) {
+		for (int i=0; i<indice; i++) {
+			if(this.colision(this.titanes[i].getRec(), titan.getRec())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
 	public void generar_titanes(int cantidad) {
 		this.titanes = new Titan[cantidad];
 
 		for (int i = 0; i < this.titanes.length; i++) {
 			int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
 			int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
-
+			
 			this.titanes[i] = new Titan(ranX, ranY, this.mikasa.getAngulo() + 180);
-		}
-
-		// Se comprueba que los titanes no choquen con mikasa al inicio.
-		for (int i = 0; i < this.titanes.length; i++) {
-			if (this.colision(this.titanes[i].getRec(), this.mikasa.getRec())) {
-				generar_titanes(cantidad);
-				return;
+			
+			while(this.choqueTitanConEdificios(this.titanes[i]) || this.choqueTitanConMikasa(this.titanes[i]) || this.interseccionTitan(this.titanes[i], i)) {
+				int x = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
+				int y = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
+				
+				this.titanes[i] = new Titan(x, y, this.mikasa.getAngulo() + 180);	
 			}
 		}
-
-		// Se comprueba que los titanes no choquen con los edificios.
-		for (int i = 0; i < this.titanes.length; i++) {
-			for (Edificio edificio: this.edificios) {
-				if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
-					generar_titanes(cantidad);
-					return;
-				}
-			}
-		}
-
-		// Se comprueba que los titanes no se solapen.
-		// De lo contrario se vuelve a llamar a la función.
-		for (int i = 0; i < this.titanes.length; i++) {
-			for (int j = 0; j < this.titanes.length; j++) {
-				if (i != j) {
-					if (this.colision(this.titanes[i].getRec(), this.titanes[j].getRec())) {
-						generar_titanes(cantidad);
-						return;
-					}
-				}
-			}
-		}
+		return;
 	}
 
 	// Esta funcion genera un nuevo titán.
@@ -425,6 +457,7 @@ public class Juego extends InterfaceJuego {
 				if (this.colision(this.disparos[i].getRec(), this.titanes[h].getRec())) {
 					this.eliminar_disparo(i);
 					this.eliminar_titan(h);
+					this.titanesEliminados+=1;
 					return;
 				}
 			}
@@ -497,6 +530,7 @@ public class Juego extends InterfaceJuego {
 			this.mikasa.setY(this.entorno.alto() - this.mikasa.getAlto() / 2);
 		}
 	}
+	
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {

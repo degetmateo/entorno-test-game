@@ -10,16 +10,19 @@ public class Mikasa {
     private Image mikasa_quieta = Herramientas.cargarImagen("mikasa_quieta.png");
     private Image mikasa_mov_1 = Herramientas.cargarImagen("mikasa_mov_1.png");
     private Image mikasa_mov_2 = Herramientas.cargarImagen("mikasa_mov_2.png");
-    private Image img_especial = Herramientas.cargarImagen("mikasa-titan.png");
+    
+    private Image mikasa_titan_mov_1 = Herramientas.cargarImagen("mikasa_titan_mov_1.png");
+    private Image mikasa_titan_mov_2 = Herramientas.cargarImagen("mikasa_titan_mov_2.png");
 
-    private Image img = this.mikasa_quieta;
+    private Image imagen_actual = this.mikasa_quieta;
+    private Image imagen_actual_especial = this.mikasa_titan_mov_1;
 
     private int velocidad;
     private String estado = "normal";
     private double angulo = 0;
     private int vidas = 3;
 
-    private int frames_animacion = 0;
+    private int frames = 0;
 
     public Mikasa(int x, int y, int velocidad) {
         this.rec = new Rectangle(x, y, 70, 70);
@@ -31,42 +34,48 @@ public class Mikasa {
         entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.WHITE);
 
         if (this.estado.equals("normal")) {
-            entorno.dibujarImagen(this.img, this.rec.x, this.rec.y, this.angulo - Math.PI / 2, 2.5);
+            entorno.dibujarImagen(this.imagen_actual, this.rec.x, this.rec.y, this.angulo - Math.PI / 2, 3);
             //entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.grados, Color.PINK);
         } else if (this.estado.equals("especial")) {
-            entorno.dibujarImagen(this.img_especial, this.rec.x, this.rec.y, this.angulo, 0.4);
+            entorno.dibujarImagen(this.imagen_actual_especial, this.rec.x, this.rec.y, this.angulo - Math.PI / 2, 3);
             //entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.grados, Color.ORANGE);
         }
     }
 
     public void animar() {
         if (this.estado.equals("normal")) {
-            if (this.frames_animacion <= 20) {
-                this.img = this.mikasa_mov_2;
-            } else if (this.frames_animacion <= 40) {
-                this.img = this.mikasa_mov_1;
-            } else if (this.frames_animacion <= 60) {
-                this.img = this.mikasa_mov_2;
+            if (this.frames <= 20) {
+                this.imagen_actual = this.mikasa_mov_2;
+            } else if (this.frames <= 40) {
+                this.imagen_actual = this.mikasa_mov_1;
+            } else if (this.frames <= 60) {
+                this.imagen_actual = this.mikasa_mov_2;
             } else {
-                this.frames_animacion = 0;
+                this.frames = 0;
             }
-        } else if (this.estado.equals("especial")) {
-            this.img = this.img_especial;
+        } else {
+            if (this.frames <= 20) {
+                this.imagen_actual_especial = this.mikasa_titan_mov_2;
+            } else if (this.frames <= 40) {
+                this.imagen_actual_especial = this.mikasa_titan_mov_1;
+            } else if (this.frames <= 60) {
+                this.imagen_actual_especial = this.mikasa_titan_mov_2;
+            } else {
+                this.frames = 0;
+            }
         }
 
-        this.frames_animacion++;
+        this.frames++;
     }
 
     // Funciones que mueven a Mikasa hacia adelante o hacia atrás.
     public void mover_adelante() {
-    	//this.img_derecha = Herramientas.cargarImagen("mikasa-derecha.png");
-        //this.img_izquierda = Herramientas.cargarImagen("mikasa-izquierda.png");
         this.setX(this.getX() + (int) (Math.cos(this.angulo) * this.velocidad));
         this.setY(this.getY() + (int) (Math.sin(this.angulo) * this.velocidad));
     }
 
     public void mover_atras() {
-       this.setX(this.getX() - (int) (Math.cos(this.angulo) * this.velocidad));
+        this.setX(this.getX() - (int) (Math.cos(this.angulo) * this.velocidad));
         this.setY(this.getY() - (int) (Math.sin(this.angulo) * this.velocidad));
     }
 

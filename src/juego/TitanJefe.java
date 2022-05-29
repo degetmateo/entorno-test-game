@@ -1,41 +1,21 @@
 package juego;
 
-import java.awt.*;
 import entorno.*;
+import java.awt.*;
 
-public class Titan {
+public class TitanJefe {
     private Rectangle rec;
-    private double angulo;
-    private double velocidad;
-    private int frames = 0;
+    private double angulo = 0;
+    private int velocidad = 2;
+    private int salud = 10;
 
-    private Image titan_quieto = Herramientas.cargarImagen("titan_quieto.png");
-    private Image titan_mov_1 = Herramientas.cargarImagen("titan_mov_1.png");
-    private Image titan_mov_2 = Herramientas.cargarImagen("titan_mov_2.png");
-    private Image imagen_actual = titan_quieto;
-
-    public Titan(int x, int y, double angulo, double velocidad) {
+    public TitanJefe(int x, int y) {
         this.rec = new Rectangle(x, y, 70, 70);
-        this.angulo = angulo;
-        this.velocidad = velocidad;
     }
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.RED);
-        entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.PINK);
-
-        if (this.frames <= 20) {
-            this.imagen_actual = this.titan_mov_2;
-        } else if (this.frames <= 40) {
-            this.imagen_actual = this.titan_mov_1;
-        } else if (this.frames <= 60) {
-            this.imagen_actual = this.titan_mov_2;
-        } else {
-            this.frames = 0;
-        }
-
-        this.frames++;
-        entorno.dibujarImagen(this.imagen_actual, this.rec.x, this.rec.y, this.angulo - Math.PI / 2, 3.5);
+        entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.WHITE);
     }
 
     public void mover_adelante() {
@@ -83,12 +63,12 @@ public class Titan {
         return this.rec;
     }
 
-    public double getVelocidad() {
-        return this.velocidad;
-    }
-
     public double getAngulo() {
         return this.angulo;
+    }
+
+    public int getSalud() {
+        return this.salud;
     }
 
     public void setX(int x) {
@@ -97,18 +77,6 @@ public class Titan {
 
     public void setY(int y) {
         this.rec.y = y;
-    }
-
-    public void setAncho(int ancho) {
-        this.rec.width = ancho;
-    }
-
-    public void setAlto(int alto) {
-        this.rec.height = alto;
-    }
-
-    public void setVelocidad(double velocidad) {
-        this.velocidad = velocidad;
     }
 
     public void setAngulo(double angulo) {
@@ -121,5 +89,9 @@ public class Titan {
         if (this.angulo > 2 * Math.PI) {
         	this.angulo -= 2 * Math.PI;
         }
+    }
+
+    public void setSalud(int salud) {
+        this.salud = salud;
     }
 }

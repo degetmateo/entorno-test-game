@@ -32,7 +32,7 @@ public class Juego extends InterfaceJuego {
 	
 	public Juego() {
 		// Inicializa el objeto entorno
-		this.entorno = new Entorno(this, "Attack on Titan - Grupo 6 - Apellido1 - Apellido2 -Apellido3 - V0.01", 800, 600);
+		this.entorno = new Entorno(this, "TP1 - Attack on Titan - Grupo 6 - Deget - Borlenghi - Rosa - Madariaga - V0.01", 800, 600);
 		// Inicializar lo que haga falta para el juego
 		// ...
 		this.mikasa = new Mikasa(entorno.ancho() / 2, entorno.alto() / 2, 4);

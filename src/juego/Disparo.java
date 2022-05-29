@@ -5,7 +5,6 @@ import entorno.Entorno;
 
 public class Disparo {
 	private Rectangle rec;
-    private Image img;
     private int velocidad = 8;
     private double angulo;
 
@@ -13,7 +12,7 @@ public class Disparo {
         this.rec = new Rectangle(x, y, 30, 15);
         this.angulo = angulo;
     }
-
+    
 	public void dibujar(Entorno entorno) {
 	    entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), this.angulo, Color.CYAN);
 	}
@@ -25,10 +24,6 @@ public class Disparo {
 
     public Rectangle getRec() {
         return this.rec;
-    }
-
-    public Image getImg() {
-        return this.img;
     }
 
     public int getX() {

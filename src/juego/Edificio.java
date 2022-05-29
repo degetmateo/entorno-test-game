@@ -6,11 +6,10 @@ import java.awt.*;
 
 public class Edificio {
     private Rectangle rec;
-    private Image img;
+    private Image img = Herramientas.cargarImagen("edificio.png");
 
     public Edificio(int x, int y, int ancho, int alto) {
         this.rec = new Rectangle(x, y, ancho, alto);
-        this.img = Herramientas.cargarImagen("edificio.png");
     }
 
     public void dibujar(Entorno entorno) {
@@ -56,9 +55,5 @@ public class Edificio {
 
     public void setAlto(int alto) {
         this.rec.height = alto;
-    }
-
-    public void setImg(String img) {
-        this.img = Herramientas.cargarImagen(img);
     }
 }

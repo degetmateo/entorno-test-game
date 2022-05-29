@@ -35,14 +35,6 @@ public class TitanJefe {
         this.setAngulo(Math.atan2(dy, dx));
     }
 
-    // public void rodear(Rectangle r) {
-    //     double dx = r.x - this.getX();
-    //     double dy = r.y - this.getY();
-
-    //     this.setAngulo(Math.atan2(dy, dx) + 90);
-    //     this.mover_adelante();
-    // }
-
     public int getX() {
         return this.rec.x;
     }

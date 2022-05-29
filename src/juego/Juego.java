@@ -85,7 +85,7 @@ public class Juego extends InterfaceJuego {
 			}
 
 			// Se van a generar hasta 5 titanes en pantalla cada cierto tiempo mientras no exista el jefe.
-			if (this.titanes.length < 5 && this.jefe == null) {
+			if (this.titanes.length < 5 && this.titanes_eliminados < 10 && this.jefe == null) {
 				if (this.contador_titan <= 0) {
 					this.generar_titan();
 					this.contador_titan = 180;
@@ -252,26 +252,35 @@ public class Juego extends InterfaceJuego {
 			   a.y - a.height / 2 < b.y + b.height / 2;
 	}
 
-	// Funcion que evita que dos rectángulos se solapen.
+	// Funcion que evita que dos rectángulos se sobrepongan.
+	// Si se sobreponen, a uno de los rectangulos se le cambia solamente una de sus coordenadas para que no se detenga por completo.
 	private void evitar_colision(Rectangle a, Rectangle b) {
-		if (a.x + a.width > b.x && a.x + a.width < b.x + b.width / 2 &&
-			a.y < b.y + b.height - 5 && a.y + a.height > b.y + 5) {
-			a.x = b.x - a.width;
+		if (a.x + a.width > b.x &&
+			a.x + a.width < b.x + b.width / 2 &&
+			a.y < b.y + b.height - 5 &&
+			a.y + a.height > b.y + 5) {
+				a.x = b.x - a.width;
 		}
 
-		if (a.y < b.y + b.height && a.y > b.y + b.height / 2 &&
-			a.x + a.width > b.x + 5 && a.x < b.x + b.width - 5) {
-			a.y = b.y + a.height;
+		if (a.y < b.y + b.height &&
+			a.y > b.y + b.height / 2 &&
+			a.x + a.width > b.x + 5 &&
+			a.x < b.x + b.width - 5) {
+				a.y = b.y + a.height;
 		}
 		
-		if (a.x < b.x + b.width && a.x > b.x + b.width / 2 &&
-			a.y + a.height > b.y + 5 && a.y < b.y + b.height - 5) {
-			a.x = b.x + b.width;
+		if (a.x < b.x + b.width &&
+			a.x > b.x + b.width / 2 &&
+			a.y + a.height > b.y + 5 &&
+			a.y < b.y + b.height - 5) {
+				a.x = b.x + b.width;
 			}
 		
-		if (a.y + a.height > b.y && a.y + a.height < b.y + b.height / 2 &&
-			a.x < b.x + b.width - 5 && a.x + a.width > b.x + 5) {
-			a.y = b.y - a.height;
+		if (a.y + a.height > b.y &&
+			a.y + a.height < b.y + b.height / 2 &&
+			a.x < b.x + b.width - 5 &&
+			a.x + a.width > b.x + 5) {
+				a.y = b.y - a.height;
 		}
 	}
 
@@ -550,6 +559,8 @@ public class Juego extends InterfaceJuego {
 		this.disparos = disparos_nuevo;
 	}
 
+	// Funcion que genera al jefe final en una posición al azar.
+	// Verifica que no se choque con nada al generarse.
 	public void generar_jefe() {
 		int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
 		int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
@@ -558,6 +569,13 @@ public class Juego extends InterfaceJuego {
 
 		for (Edificio edificio: this.edificios) {
 			if (this.colision(this.jefe.getRec(), edificio.getRec())) {
+				this.generar_jefe();
+				return;
+			}
+		}
+
+		for (Titan titan: this.titanes) {
+			if (this.colision(this.jefe.getRec(), titan.getRec())) {
 				this.generar_jefe();
 				return;
 			}
@@ -574,13 +592,22 @@ public class Juego extends InterfaceJuego {
 		this.jefe.mirar_mikasa(this.mikasa.getX(), this.mikasa.getY());
 		this.jefe.mover_adelante();
 
-		// Se comprueba si el jefe choca con algún edificio.
+		// Evitar que el jefe choque con edificios.
 		for (Edificio edificio: this.edificios) {
 			if (this.colision(this.jefe.getRec(), edificio.getRec())) {
+				this.jefe.mover_atras();
+
+				double dx = edificio.getX() - this.jefe.getX();
+				double dy = edificio.getY() - this.jefe.getY();
+
+				this.jefe.setAngulo(Math.atan2(dy, dx) + Math.PI / 2);
+				this.jefe.mover_adelante();
+
 				this.evitar_colision(this.jefe.getRec(), edificio.getRec());
 			}
 		}
 
+		// Evitar que el jefe se salga de la pantalla.
 		if (this.jefe.getX() < this.jefe.getAncho() / 2) {
 			this.jefe.setX(this.jefe.getAncho() / 2);
 		}
@@ -663,35 +690,15 @@ public class Juego extends InterfaceJuego {
 			// Hacer que los titanes esquiven los edificios.
 			for (Edificio edificio: this.edificios) {
 				if (this.colision(this.titanes[i].getRec(), edificio.getRec())) {
+					this.titanes[i].mover_atras();
+
+					double dx = edificio.getX() - this.titanes[i].getX();
+					double dy = edificio.getY() - this.titanes[i].getY();
+
+					this.titanes[i].setAngulo(Math.atan2(dy, dx) + Math.PI / 2);
+					this.titanes[i].mover_adelante();
+
 					this.evitar_colision(this.titanes[i].getRec(), edificio.getRec());
-
-					// if (this.titanes[i].getX() + this.titanes[i].getAncho() > edificio.getX() &&
-					// 	this.titanes[i].getX() + this.titanes[i].getAncho() < edificio.getX() + edificio.getAncho() / 2 &&
-					// 	this.titanes[i].getY() < edificio.getY() + edificio.getAlto() - 5 &&
-					// 	this.titanes[i].getY() + this.titanes[i].getAlto() > edificio.getY() + 5) {
-					// 	this.titanes[i].setX(edificio.getX() - this.titanes[i].getAncho());
-					// }
-					
-					// if (this.titanes[i].getY() < edificio.getY() + edificio.getAlto() &&
-					// 	this.titanes[i].getY() > edificio.getY() + edificio.getAlto() / 2 &&
-					// 	this.titanes[i].getX() + this.titanes[i].getAncho() > edificio.getX() + 5 &&
-					// 	this.titanes[i].getX() < edificio.getX() + edificio.getAncho() - 5) {
-					// 	this.titanes[i].setY(edificio.getY() + this.titanes[i].getAlto());
-					// }
-					
-					// if (this.titanes[i].getX() < edificio.getX() + edificio.getAncho() &&
-					// 	this.titanes[i].getX() > edificio.getX() + edificio.getAncho() / 2 &&
-					// 	this.titanes[i].getY() + this.titanes[i].getAlto() > edificio.getY() + 5 &&
-					// 	this.titanes[i].getY() < edificio.getY() + edificio.getAlto() - 5) {
-					// 	this.titanes[i].setX(edificio.getX() + edificio.getAncho());
-					// }
-
-					// if (this.titanes[i].getY() + this.titanes[i].getAlto() > edificio.getY() &&
-					// 	this.titanes[i].getY() + this.titanes[i].getAlto() < edificio.getY() + edificio.getAlto() / 2 &&
-					// 	this.titanes[i].getX() < edificio.getX() + edificio.getAncho() - 5 &&
-					// 	this.titanes[i].getX() + this.titanes[i].getAncho() > edificio.getX() + 5) {
-					// 	this.titanes[i].setY(edificio.getY() - this.titanes[i].getAlto());
-					// }
 				}
 			}
 
@@ -699,6 +706,13 @@ public class Juego extends InterfaceJuego {
 			for (int j = 0; j < this.titanes.length; j++) {
 				if (i != j && this.colision(this.titanes[i].getRec(), this.titanes[j].getRec())) {
 					this.evitar_colision(this.titanes[i].getRec(), this.titanes[j].getRec());
+				}
+			}
+
+			// Verificar que los titanes no se choquen con el jefe.
+			if (this.jefe != null) {
+				if (this.colision(this.titanes[i].getRec(), this.jefe.getRec())) {
+					this.evitar_colision(this.titanes[i].getRec(), this.jefe.getRec());
 				}
 			}
 
@@ -727,5 +741,4 @@ public class Juego extends InterfaceJuego {
 	public static void main(String[] args) {
 		Juego juego = new Juego();
 	}
-
 }

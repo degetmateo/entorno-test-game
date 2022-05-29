@@ -648,11 +648,11 @@ public class Juego extends InterfaceJuego {
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_IZQUIERDA) || this.entorno.estaPresionada('a')) {
-			this.mikasa.girar(Extras.radianes(-5));
+			this.mikasa.girar(-0.1);
 		}
 
 		if (this.entorno.estaPresionada(this.entorno.TECLA_DERECHA) || this.entorno.estaPresionada('d')) {
-			this.mikasa.girar(Extras.radianes(5));
+			this.mikasa.girar(0.1);
 		}
 
 		for (Edificio edificio: this.edificios) {

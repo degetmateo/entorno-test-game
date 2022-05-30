@@ -6,7 +6,7 @@ import java.awt.*;
 public class TitanJefe {
     private Rectangle rec;
     private double angulo = 0;
-    private int velocidad = 2;
+    private double velocidad;
     private int salud = 10;
 
     private Image titan_quieto = Herramientas.cargarImagen("titan_jefe_quieto.png");
@@ -15,8 +15,9 @@ public class TitanJefe {
     private Image imagen_actual = titan_quieto;
     private int frames = 0;
 
-    public TitanJefe(int x, int y) {
+    public TitanJefe(int x, int y, double velocidad) {
         this.rec = new Rectangle(x, y, 70, 70);
+        this.velocidad = velocidad;
     }
 
     public void dibujar(Entorno entorno) {

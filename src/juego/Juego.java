@@ -557,7 +557,14 @@ public class Juego extends InterfaceJuego {
 		int ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
 		int ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 
-		this.jefe = new TitanJefe(ranX, ranY);
+		double vel = 2;
+		switch (this.nivel) {
+			case 1: vel = 2; break;
+			case 2: vel = 2.5; break;
+			case 3: vel = 3; break;
+		}
+
+		this.jefe = new TitanJefe(ranX, ranY, vel);
 
 		for (Edificio edificio: this.edificios) {
 			if (this.colision(this.jefe.getRec(), edificio.getRec())) {

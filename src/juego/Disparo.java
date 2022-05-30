@@ -1,12 +1,13 @@
 package juego;
 
 import java.awt.*;
-import entorno.Entorno;
+import entorno.*;
 
 public class Disparo {
 	private Rectangle rec;
     private int velocidad = 8;
     private double angulo;
+    private Image bala = Herramientas.cargarImagen("bala.png");
 
     public Disparo(int x, int y, double angulo) {
         this.rec = new Rectangle(x, y, 30, 15);
@@ -15,6 +16,7 @@ public class Disparo {
     
 	public void dibujar(Entorno entorno) {
 	    entorno.dibujarRectangulo(this.getX(), this.getY(), this.getAncho(), this.getAlto(), this.angulo, Color.CYAN);
+        entorno.dibujarImagen(this.bala, this.getX(), this.getY(), this.angulo, 0.1);
 	}
 	
     public void mover() {

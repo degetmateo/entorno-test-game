@@ -9,13 +9,31 @@ public class TitanJefe {
     private int velocidad = 2;
     private int salud = 10;
 
+    private Image titan_quieto = Herramientas.cargarImagen("titan_jefe_quieto.png");
+    private Image titan_mov_1 = Herramientas.cargarImagen("titan_jefe_mov_1.png");
+    private Image titan_mov_2 = Herramientas.cargarImagen("titan_jefe_mov_2.png");
+    private Image imagen_actual = titan_quieto;
+    private int frames = 0;
+
     public TitanJefe(int x, int y) {
         this.rec = new Rectangle(x, y, 70, 70);
     }
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarRectangulo(this.rec.x, this.rec.y, this.rec.width, this.rec.height, 0, Color.RED);
-        entorno.dibujarTriangulo(this.rec.x, this.rec.y, this.rec.height, this.rec.width / 2, this.angulo, Color.WHITE);
+        
+        if (this.frames <= 20) {
+            this.imagen_actual = this.titan_mov_2;
+        } else if (this.frames <= 40) {
+            this.imagen_actual = this.titan_mov_1;
+        } else if (this.frames <= 60) {
+            this.imagen_actual = this.titan_mov_2;
+        } else {
+            this.frames = 0;
+        }
+
+        this.frames++;
+        entorno.dibujarImagen(this.imagen_actual, this.rec.x, this.rec.y, this.angulo - Math.PI / 2, 3.5);
     }
 
     public void mover_adelante() {

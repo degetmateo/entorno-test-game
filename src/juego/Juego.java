@@ -15,6 +15,7 @@ public class Juego extends InterfaceJuego {
 	private Image fondo_inicio = Herramientas.cargarImagen("fondo-inicio.jpg");
 	private Image fondo_juego = Herramientas.cargarImagen("fondo-juego.jpg");
 	private Image fondo_victoria = Herramientas.cargarImagen("fondo-victoria.jpg");
+	private Image fondo_derrota = Herramientas.cargarImagen("fondo-derrota.jpg");
 	private Image imagen_corazon = Herramientas.cargarImagen("corazon.png");
 	private Mikasa mikasa;
 	private Edificio[] edificios;
@@ -29,6 +30,8 @@ public class Juego extends InterfaceJuego {
 
 	private Clip sonido_disparo = Sonido.getSound("crash.wav");
 	private Clip sonido_suero = Sonido.getSound("suero.wav");
+	private Clip sonido_vida = Sonido.getSound("vida.wav");
+	private Clip sonido_final = Sonido.getSound("final.wav");
 	
 	public Juego() {
 		// Inicializa el objeto entorno
@@ -109,6 +112,7 @@ public class Juego extends InterfaceJuego {
 			if (this.mikasa.getEstado().equals("normal")) {
 				for (int i = 0; i < this.titanes.length; i++) {
 					if (this.colision(this.mikasa.getRec(), this.titanes[i].getRec())) {
+						Sonido.playSound(this.sonido_vida);
 						this.mikasa.setVidas(this.mikasa.getVidas() - 1);
 						this.eliminar_titan(i);
 		
@@ -224,11 +228,7 @@ public class Juego extends InterfaceJuego {
 	}
 
 	public void dibujar_derrota() {
-		entorno.cambiarFont("Arial", 32, Color.RED);
-		entorno.escribirTexto("Has Perdido", 50, 60);
-
-		entorno.cambiarFont("Arial", 28, Color.WHITE);
-		entorno.escribirTexto("Presione ENTER para volver a jugar", 50, 100);
+		this.entorno.dibujarImagen(this.fondo_derrota, 400, 300, 0, 1);
 	}
 
 	// Funcion que reinicia las variables del juego para que este se pueda volver a jugar.
@@ -255,36 +255,24 @@ public class Juego extends InterfaceJuego {
 	// Funcion que evita que dos rectángulos se sobrepongan.
 	// Si se sobreponen, a uno de los rectangulos se le cambia solamente una de sus coordenadas para que no se detenga por completo.
 	private void evitar_colision(Rectangle a, Rectangle b) {
-		if (a.x + a.width > b.x &&
-			a.x + a.width < b.x + b.width / 2 &&
-			a.y < b.y + b.height - 5 &&
-			a.y + a.height > b.y + 5) {
-				a.x = b.x - a.width;
+		if (a.x + a.width > b.x && a.x + a.width < b.x + b.width / 2 && a.y < b.y + b.height - 5 && a.y + a.height > b.y + 5) {
+			a.x = b.x - a.width;
 		}
 
-		if (a.y < b.y + b.height &&
-			a.y > b.y + b.height / 2 &&
-			a.x + a.width > b.x + 5 &&
-			a.x < b.x + b.width - 5) {
-				a.y = b.y + a.height;
+		if (a.y < b.y + b.height && a.y > b.y + b.height / 2 && a.x + a.width > b.x + 5 && a.x < b.x + b.width - 5) {
+			a.y = b.y + a.height;
 		}
 		
-		if (a.x < b.x + b.width &&
-			a.x > b.x + b.width / 2 &&
-			a.y + a.height > b.y + 5 &&
-			a.y < b.y + b.height - 5) {
-				a.x = b.x + b.width;
-			}
+		if (a.x < b.x + b.width && a.x > b.x + b.width / 2 && a.y + a.height > b.y + 5 && a.y < b.y + b.height - 5) {
+			a.x = b.x + b.width;
+		}
 		
-		if (a.y + a.height > b.y &&
-			a.y + a.height < b.y + b.height / 2 &&
-			a.x < b.x + b.width - 5 &&
-			a.x + a.width > b.x + 5) {
-				a.y = b.y - a.height;
+		if (a.y + a.height > b.y && a.y + a.height < b.y + b.height / 2 && a.x < b.x + b.width - 5 && a.x + a.width > b.x + 5) {
+			a.y = b.y - a.height;
 		}
 	}
 
-	// Esta funcion genera edificios (obstáculos) en una posición al azar.
+	// Esta funcion genera los obstáculos en unas posiciones definidas.
 	public void generar_edificios() {
 		this.edificios = new Edificio[4];
 
@@ -340,12 +328,12 @@ public class Juego extends InterfaceJuego {
 		return false;
 	}
 
-	// Choque titanes con Mikasa MAR
+	// Choque titanes con Mikasa
 	public boolean choque_titan_mikasa(Titan titan){
 		return this.colision(titan.getRec(), this.mikasa.getRec());
 	}
 	
-	// Interseccion de titanes MAR
+	// Interseccion de titanes
 	public boolean choque_titan_titan(Titan titan, int indice) {
 		for (int i = 0; i < this.titanes.length; i++) {
 			if (i != indice && this.titanes[i] != null) {
@@ -375,8 +363,12 @@ public class Juego extends InterfaceJuego {
 
 			this.titanes[i] = new Titan(ranX, ranY, this.mikasa.getAngulo() + 180, vel);
 			
-			// While que comprueba que los titanes no choquen entre ellos, con los edificios o mikasa al ser generados. MAR
-			while (this.choque_titan_edificio(this.titanes[i]) || this.choque_titan_mikasa(this.titanes[i]) || this.choque_titan_titan(this.titanes[i], i)) {
+			// While que comprueba que los titanes no choquen entre ellos, con los edificios o mikasa al ser generados.
+			while (
+				this.choque_titan_edificio(this.titanes[i]) ||
+				this.choque_titan_mikasa(this.titanes[i]) ||
+				this.choque_titan_titan(this.titanes[i], i)
+			) {
 				ranX = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.ancho() - 99);
 				ranY = (int) ThreadLocalRandom.current().nextInt(100, this.entorno.alto() - 99);
 				
@@ -585,6 +577,8 @@ public class Juego extends InterfaceJuego {
 			this.generar_jefe();
 			return;
 		}
+
+		Sonido.playSound(this.sonido_final);
 	}
 
 	public void actualizar_jefe() {
@@ -636,7 +630,6 @@ public class Juego extends InterfaceJuego {
 	// Funcion que actualiza a mikasa.
 	public void actualizar_mikasa() {
 		// Comprobar si una tecla de movimiento está presionada y mover a mikasa en consecuencia.
-		// Comprobar si mikasa colisiona con un edificio.
 		if (this.entorno.estaPresionada(this.entorno.TECLA_ARRIBA) || this.entorno.estaPresionada('w')) {
 			this.mikasa.mover_adelante();
 			this.mikasa.animar();
@@ -655,6 +648,7 @@ public class Juego extends InterfaceJuego {
 			this.mikasa.girar(0.1);
 		}
 
+		// Evitar que mikasa colisione con algun edificio.
 		for (Edificio edificio: this.edificios) {
 			if (this.colision(this.mikasa.getRec(), edificio.getRec())) {
 				this.evitar_colision(this.mikasa.getRec(), edificio.getRec());
